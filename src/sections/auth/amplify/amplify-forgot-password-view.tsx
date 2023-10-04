@@ -53,7 +53,7 @@ export default function AmplifyForgotPasswordView() {
         email: data.email,
       }).toString();
 
-      const href = `${paths.auth.amplify.newPassword}?${searchParams}`;
+      const href = `${paths.auth.newPassword}?${searchParams}`;
       router.push(href);
     } catch (error) {
       console.error(error);
@@ -76,7 +76,7 @@ export default function AmplifyForgotPasswordView() {
 
       <Link
         component={RouterLink}
-        href={paths.auth.amplify.login}
+        href={paths.auth.login}
         color="inherit"
         variant="subtitle2"
         sx={{

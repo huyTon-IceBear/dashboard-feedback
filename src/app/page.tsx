@@ -1,5 +1,4 @@
-// sections
-import { JwtLoginView } from 'src/sections/auth/jwt';
+import { redirect } from 'next/navigation';
 
 // ----------------------------------------------------------------------
 
@@ -8,5 +7,7 @@ export const metadata = {
 };
 
 export default function HomePage() {
-  return <JwtLoginView />;
+  redirect('/auth/login');
+
+  return null;
 }

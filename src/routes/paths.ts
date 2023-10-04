@@ -17,13 +17,6 @@ const ROOTS = {
 // ----------------------------------------------------------------------
 
 export const paths = {
-  comingSoon: '/coming-soon',
-  maintenance: '/maintenance',
-  pricing: '/pricing',
-  payment: '/payment',
-  about: '/about-us',
-  contact: '/contact-us',
-  faqs: '/faqs',
   page403: '/error/403',
   page404: '/error/404',
   page500: '/error/500',
@@ -52,23 +45,11 @@ export const paths = {
   },
   // AUTH
   auth: {
-    amplify: {
-      login: `${ROOTS.AUTH}/amplify/login`,
-      verify: `${ROOTS.AUTH}/amplify/verify`,
-      register: `${ROOTS.AUTH}/amplify/register`,
-      newPassword: `${ROOTS.AUTH}/amplify/new-password`,
-      forgotPassword: `${ROOTS.AUTH}/amplify/forgot-password`,
-    },
-    jwt: {
-      login: `${ROOTS.AUTH}/jwt/login`,
-      register: `${ROOTS.AUTH}/jwt/register`,
-    },
-    firebase: {
-      login: `${ROOTS.AUTH}/firebase/login`,
-      verify: `${ROOTS.AUTH}/firebase/verify`,
-      register: `${ROOTS.AUTH}/firebase/register`,
-      forgotPassword: `${ROOTS.AUTH}/firebase/forgot-password`,
-    },
+    login: `${ROOTS.AUTH}/login`,
+    verify: `${ROOTS.AUTH}/verify`,
+    register: `${ROOTS.AUTH}/register`,
+    newPassword: `${ROOTS.AUTH}/new-password`,
+    forgotPassword: `${ROOTS.AUTH}/forgot-password`,
     auth0: {
       login: `${ROOTS.AUTH}/auth0/login`,
     },

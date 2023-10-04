@@ -68,7 +68,7 @@ export default function FirebaseRegisterView() {
         email: data.email,
       }).toString();
 
-      const href = `${paths.auth.firebase.verify}?${searchParams}`;
+      const href = `${paths.auth.verify}?${searchParams}`;
 
       router.push(href);
     } catch (error) {
@@ -109,7 +109,7 @@ export default function FirebaseRegisterView() {
       <Stack direction="row" spacing={0.5}>
         <Typography variant="body2"> Already have an account? </Typography>
 
-        <Link href={paths.auth.firebase.login} component={RouterLink} variant="subtitle2">
+        <Link href={paths.auth.login} component={RouterLink} variant="subtitle2">
           Sign in
         </Link>
       </Stack>

@@ -24,9 +24,6 @@ import 'slick-carousel/slick/slick-theme.css';
 // image
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
-// components
-import AuthModernLayout from 'src/layouts/auth/modern';
-
 // ----------------------------------------------------------------------
 
 // locales
@@ -111,9 +108,7 @@ export default function RootLayout({ children }: Props) {
                     <CheckoutProvider>
                       <SettingsDrawer />
                       <ProgressBar />
-                      <AuthConsumer>
-                        <AuthModernLayout>{children}</AuthModernLayout>
-                      </AuthConsumer>
+                      <AuthConsumer>{children}</AuthConsumer>
                     </CheckoutProvider>
                   </SnackbarProvider>
                 </MotionLazy>
