@@ -1,5 +1,5 @@
 // sections
-import { HomeView } from 'src/sections/home/view';
+import { JwtLoginView } from 'src/sections/auth/jwt';
 
 // ----------------------------------------------------------------------
 
@@ -8,5 +8,5 @@ export const metadata = {
 };
 
 export default function HomePage() {
-  return <HomeView />;
+  return <JwtLoginView />;
 }

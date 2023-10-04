@@ -1,12 +1,12 @@
 // sections
-import { ModernLoginView } from 'src/sections/auth-demo/modern';
+import { JwtLoginView } from 'src/sections/auth/jwt';
 
 // ----------------------------------------------------------------------
 
 export const metadata = {
-  title: 'Auth Modern: Login',
+  title: 'Jwt: Login',
 };
 
 export default function ModernLoginPage() {
-  return <ModernLoginView />;
+  return <JwtLoginView />;
 }

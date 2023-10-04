@@ -3,7 +3,7 @@
 // auth
 import { GuestGuard } from 'src/auth/guard';
 // components
-import AuthClassicLayout from 'src/layouts/auth/classic';
+import AuthModernLayout from 'src/layouts/auth/modern';
 
 // ----------------------------------------------------------------------
 
@@ -14,9 +14,7 @@ type Props = {
 export default function Layout({ children }: Props) {
   return (
     <GuestGuard>
-      <AuthClassicLayout title="Manage the job more effectively with Minimal">
-        {children}
-      </AuthClassicLayout>
+      <AuthModernLayout>{children}</AuthModernLayout>
     </GuestGuard>
   );
 }

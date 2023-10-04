@@ -1,3 +1,5 @@
+'use client';
+
 // i18n
 import 'src/locales/i18n';
 
@@ -22,6 +24,9 @@ import 'slick-carousel/slick/slick-theme.css';
 // image
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
+// components
+import AuthModernLayout from 'src/layouts/auth/modern';
+
 // ----------------------------------------------------------------------
 
 // locales
@@ -45,9 +50,8 @@ import { AuthProvider, AuthConsumer } from 'src/auth/context/jwt';
 // ----------------------------------------------------------------------
 
 export const metadata = {
-  title: 'Minimal UI Kit',
-  description:
-    'The starting point for your next project with Minimal UI Kit, built on the newest version of Material-UI ©, ready to be customized to your style',
+  title: 'Feedback Dashboard',
+  description: 'This is the Feedback Dashboard',
   keywords: 'react,material,kit,application,dashboard,admin,template',
   themeColor: '#000000',
   manifest: '/manifest.json',
@@ -107,7 +111,9 @@ export default function RootLayout({ children }: Props) {
                     <CheckoutProvider>
                       <SettingsDrawer />
                       <ProgressBar />
-                      <AuthConsumer>{children}</AuthConsumer>
+                      <AuthConsumer>
+                        <AuthModernLayout>{children}</AuthModernLayout>
+                      </AuthConsumer>
                     </CheckoutProvider>
                   </SnackbarProvider>
                 </MotionLazy>

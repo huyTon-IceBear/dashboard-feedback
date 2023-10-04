@@ -1,12 +1,12 @@
 // sections
-import { ModernRegisterView } from 'src/sections/auth-demo/modern';
+import { JwtRegisterView } from 'src/sections/auth/jwt';
 
 // ----------------------------------------------------------------------
 
 export const metadata = {
-  title: 'Auth Modern: Register',
+  title: 'Jwt: Register',
 };
 
 export default function ModernRegisterPage() {
-  return <ModernRegisterView />;
+  return <JwtRegisterView />;
 }
