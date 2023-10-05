@@ -1,12 +1,12 @@
 // sections
-import { OverviewAppView } from 'src/sections/overview/app/view';
+import { OverviewAnalyticsView } from 'src/sections/overview/analytics/view';
 
 // ----------------------------------------------------------------------
 
 export const metadata = {
-  title: 'Dashboard: App',
+  title: 'Dashboard: Analytics',
 };
 
-export default function OverviewAppPage() {
-  return <OverviewAppView />;
+export default function OverviewAnalyticsPage() {
+  return <OverviewAnalyticsView />;
 }
