@@ -68,7 +68,7 @@ export function useNavData() {
             icon: ICONS.invoice,
           },
           {
-            title: t('Feedback'),
+            title: t('Task'),
             path: paths.dashboard.order.root,
             icon: ICONS.order,
           },
