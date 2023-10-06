@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import Stack, { StackProps } from '@mui/material/Stack';
 // types
 import { IInvoiceTableFilters, IInvoiceTableFilterValue } from 'src/types/invoice';
+import { Feedback, FeedbackTableFilters, FeedbackTableFilterValue } from 'src/types/feedback';
 // components
 import Iconify from 'src/components/iconify';
 import { shortDateLabel } from 'src/components/custom-date-range-picker';
@@ -13,15 +14,15 @@ import { shortDateLabel } from 'src/components/custom-date-range-picker';
 // ----------------------------------------------------------------------
 
 type Props = StackProps & {
-  filters: IInvoiceTableFilters;
-  onFilters: (name: string, value: IInvoiceTableFilterValue) => void;
+  filters: FeedbackTableFilters;
+  onFilters: (name: string, value: FeedbackTableFilterValue) => void;
   //
   onResetFilters: VoidFunction;
   //
   results: number;
 };
 
-export default function InvoiceTableFiltersResult({
+export default function FeedbackTableFiltersResult({
   filters,
   onFilters,
   //
@@ -30,20 +31,22 @@ export default function InvoiceTableFiltersResult({
   results,
   ...other
 }: Props) {
-  const shortLabel = shortDateLabel(filters.startDate, filters.endDate);
+  const shortLabel = shortDateLabel(filters.startDate, new Date());
 
-  const handleRemoveService = (inputValue: string) => {
-    const newValue = filters.service.filter((item) => item !== inputValue);
-    onFilters('service', newValue);
+  const handleRemoveType = () => {
+    onFilters('type', 'all');
   };
 
-  const handleRemoveStatus = () => {
-    onFilters('status', 'all');
+  const handleRemoveIssue = () => {
+    onFilters('issue', '');
+  };
+
+  const handleRemoveElement = () => {
+    onFilters('element', '');
   };
 
   const handleRemoveDate = () => {
     onFilters('startDate', null);
-    onFilters('endDate', null);
   };
 
   return (
@@ -56,26 +59,35 @@ export default function InvoiceTableFiltersResult({
       </Box>
 
       <Stack flexGrow={1} spacing={1} direction="row" flexWrap="wrap" alignItems="center">
-        {!!filters.service.length && (
+        {filters.issue && (
+          <Block label="Issue:">
+            <Chip
+              key={filters.issue}
+              label={filters.issue}
+              size="small"
+              onDelete={handleRemoveIssue}
+            />
+          </Block>
+        )}
+
+        {filters.element && (
           <Block label="Service:">
-            {filters.service.map((item) => (
-              <Chip
-                key={item}
-                label={item}
-                size="small"
-                onDelete={() => handleRemoveService(item)}
-              />
-            ))}
+            <Chip
+              key={filters.element}
+              label={filters.element}
+              size="small"
+              onDelete={handleRemoveIssue}
+            />
           </Block>
         )}
 
-        {filters.status !== 'all' && (
-          <Block label="Status:">
-            <Chip size="small" label={filters.status} onDelete={handleRemoveStatus} />
+        {filters.type !== 'all' && (
+          <Block label="Type:">
+            <Chip size="small" label={filters.type} onDelete={handleRemoveType} />
           </Block>
         )}
 
-        {filters.startDate && filters.endDate && (
+        {filters.startDate && (
           <Block label="Date:">
             <Chip size="small" label={shortLabel} onDelete={handleRemoveDate} />
           </Block>

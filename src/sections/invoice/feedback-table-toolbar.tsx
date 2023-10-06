@@ -12,30 +12,28 @@ import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 // types
-import { IInvoiceTableFilters, IInvoiceTableFilterValue } from 'src/types/invoice';
+import { Feedback, FeedbackTableFilters, FeedbackTableFilterValue } from 'src/types/feedback';
+
 // components
 import Iconify from 'src/components/iconify';
-import CustomPopover, { usePopover } from 'src/components/custom-popover';
 
 // ----------------------------------------------------------------------
 
 type Props = {
-  filters: IInvoiceTableFilters;
-  onFilters: (name: string, value: IInvoiceTableFilterValue) => void;
+  filters: FeedbackTableFilters;
+  onFilters: (name: string, value: FeedbackTableFilterValue) => void;
   //
-  dateError: boolean;
-  serviceOptions: string[];
+  issueOptions: string[];
+  elementOptions: string[];
 };
 
-export default function InvoiceTableToolbar({
+export default function FeedbackTableToolbar({
   filters,
   onFilters,
   //
-  dateError,
-  serviceOptions,
+  elementOptions,
+  issueOptions,
 }: Props) {
-  const popover = usePopover();
-
   const handleFilterName = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onFilters('name', event.target.value);
@@ -43,12 +41,16 @@ export default function InvoiceTableToolbar({
     [onFilters]
   );
 
-  const handleFilterService = useCallback(
-    (event: SelectChangeEvent<string[]>) => {
-      onFilters(
-        'service',
-        typeof event.target.value === 'string' ? event.target.value.split(',') : event.target.value
-      );
+  const handleFilterIssue = useCallback(
+    (event: SelectChangeEvent<string>) => {
+      onFilters('issue', event.target.value as string);
+    },
+    [onFilters]
+  );
+
+  const handleFilterElement = useCallback(
+    (event: SelectChangeEvent<string>) => {
+      onFilters('element', event.target.value as string);
     },
     [onFilters]
   );
@@ -56,13 +58,6 @@ export default function InvoiceTableToolbar({
   const handleFilterStartDate = useCallback(
     (newValue: Date | null) => {
       onFilters('startDate', newValue);
-    },
-    [onFilters]
-  );
-
-  const handleFilterEndDate = useCallback(
-    (newValue: Date | null) => {
-      onFilters('endDate', newValue);
     },
     [onFilters]
   );
@@ -87,19 +82,38 @@ export default function InvoiceTableToolbar({
             width: { xs: 1, md: 180 },
           }}
         >
-          <InputLabel>Service</InputLabel>
+          <InputLabel>Issue</InputLabel>
 
           <Select
-            multiple
-            value={filters.service}
-            onChange={handleFilterService}
-            input={<OutlinedInput label="Service" />}
-            renderValue={(selected) => selected.map((value) => value).join(', ')}
+            value={filters.issue}
+            onChange={handleFilterIssue}
+            input={<OutlinedInput label="Issue" />}
             sx={{ textTransform: 'capitalize' }}
           >
-            {serviceOptions.map((option) => (
+            {issueOptions.map((option) => (
               <MenuItem key={option} value={option}>
-                <Checkbox disableRipple size="small" checked={filters.service.includes(option)} />
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl
+          sx={{
+            flexShrink: 0,
+            width: { xs: 1, md: 180 },
+          }}
+        >
+          <InputLabel>Element</InputLabel>
+
+          <Select
+            value={filters.element}
+            onChange={handleFilterElement}
+            input={<OutlinedInput label="Element" />}
+            sx={{ textTransform: 'capitalize' }}
+          >
+            {elementOptions.map((option) => (
+              <MenuItem key={option} value={option}>
                 {option}
               </MenuItem>
             ))}
@@ -116,27 +130,12 @@ export default function InvoiceTableToolbar({
           }}
         />
 
-        <DatePicker
-          label="End date"
-          value={filters.endDate}
-          onChange={handleFilterEndDate}
-          slotProps={{
-            textField: {
-              fullWidth: true,
-              error: dateError,
-            },
-          }}
-          sx={{
-            maxWidth: { md: 180 },
-          }}
-        />
-
         <Stack direction="row" alignItems="center" spacing={2} flexGrow={1} sx={{ width: 1 }}>
           <TextField
             fullWidth
             value={filters.name}
             onChange={handleFilterName}
-            placeholder="Search customer or invoice number..."
+            placeholder="Search customer or description..."
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -145,46 +144,8 @@ export default function InvoiceTableToolbar({
               ),
             }}
           />
-
-          <IconButton onClick={popover.onOpen}>
-            <Iconify icon="eva:more-vertical-fill" />
-          </IconButton>
         </Stack>
       </Stack>
-
-      <CustomPopover
-        open={popover.open}
-        onClose={popover.onClose}
-        arrow="right-top"
-        sx={{ width: 140 }}
-      >
-        <MenuItem
-          onClick={() => {
-            popover.onClose();
-          }}
-        >
-          <Iconify icon="solar:printer-minimalistic-bold" />
-          Print
-        </MenuItem>
-
-        <MenuItem
-          onClick={() => {
-            popover.onClose();
-          }}
-        >
-          <Iconify icon="solar:import-bold" />
-          Import
-        </MenuItem>
-
-        <MenuItem
-          onClick={() => {
-            popover.onClose();
-          }}
-        >
-          <Iconify icon="solar:export-bold" />
-          Export
-        </MenuItem>
-      </CustomPopover>
     </>
   );
 }

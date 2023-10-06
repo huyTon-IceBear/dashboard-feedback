@@ -16,7 +16,7 @@ import { useBoolean } from 'src/hooks/use-boolean';
 // utils
 import { fCurrency } from 'src/utils/format-number';
 // types
-import { IInvoice } from 'src/types/invoice';
+import { Feedback, FeedbackTableFilters, FeedbackTableFilterValue } from 'src/types/feedback';
 // components
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
@@ -26,23 +26,21 @@ import CustomPopover, { usePopover } from 'src/components/custom-popover';
 // ----------------------------------------------------------------------
 
 type Props = {
-  row: IInvoice;
+  row: Feedback;
   selected: boolean;
   onSelectRow: VoidFunction;
   onViewRow: VoidFunction;
-  onEditRow: VoidFunction;
   onDeleteRow: VoidFunction;
 };
 
-export default function InvoiceTableRow({
+export default function FeedbackTableRow({
   row,
   selected,
   onSelectRow,
   onViewRow,
-  onEditRow,
   onDeleteRow,
 }: Props) {
-  const { sent, invoiceNumber, createDate, dueDate, status, invoiceTo, totalAmount } = row;
+  const { id, type, element, description, creator, createDate, issue } = row;
 
   const confirm = useBoolean();
 
@@ -55,29 +53,31 @@ export default function InvoiceTableRow({
           <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell>
 
+        <TableCell>{id}</TableCell>
+
+        <TableCell>
+          <Label
+            variant="soft"
+            color={
+              (type === 'positive' && 'success') || (type === 'negative' && 'warning') || 'default'
+            }
+          >
+            {type}
+          </Label>
+        </TableCell>
+
+        <TableCell>{element}</TableCell>
+
+        <TableCell>{description}</TableCell>
+
         <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-          <Avatar alt={invoiceTo.name} sx={{ mr: 2 }}>
-            {invoiceTo.name.charAt(0).toUpperCase()}
+          <Avatar alt={creator} sx={{ mr: 2 }}>
+            {creator.charAt(0).toUpperCase()}
           </Avatar>
 
-          <ListItemText
-            disableTypography
-            primary={
-              <Typography variant="body2" noWrap>
-                {invoiceTo.name}
-              </Typography>
-            }
-            secondary={
-              <Link
-                noWrap
-                variant="body2"
-                onClick={onViewRow}
-                sx={{ color: 'text.disabled', cursor: 'pointer' }}
-              >
-                {invoiceNumber}
-              </Link>
-            }
-          />
+          <Typography variant="body2" noWrap>
+            {creator}
+          </Typography>
         </TableCell>
 
         <TableCell>
@@ -91,37 +91,6 @@ export default function InvoiceTableRow({
               typography: 'caption',
             }}
           />
-        </TableCell>
-
-        <TableCell>
-          <ListItemText
-            primary={format(new Date(dueDate), 'dd MMM yyyy')}
-            secondary={format(new Date(dueDate), 'p')}
-            primaryTypographyProps={{ typography: 'body2', noWrap: true }}
-            secondaryTypographyProps={{
-              mt: 0.5,
-              component: 'span',
-              typography: 'caption',
-            }}
-          />
-        </TableCell>
-
-        <TableCell>{fCurrency(totalAmount)}</TableCell>
-
-        <TableCell align="center">{sent}</TableCell>
-
-        <TableCell>
-          <Label
-            variant="soft"
-            color={
-              (status === 'paid' && 'success') ||
-              (status === 'pending' && 'warning') ||
-              (status === 'overdue' && 'error') ||
-              'default'
-            }
-          >
-            {status}
-          </Label>
         </TableCell>
 
         <TableCell align="right" sx={{ px: 1 }}>
@@ -149,12 +118,12 @@ export default function InvoiceTableRow({
 
         <MenuItem
           onClick={() => {
-            onEditRow();
+            console.log('create task');
             popover.onClose();
           }}
         >
           <Iconify icon="solar:pen-bold" />
-          Edit
+          Create Task
         </MenuItem>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
