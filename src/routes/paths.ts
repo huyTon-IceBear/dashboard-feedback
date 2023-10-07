@@ -88,6 +88,11 @@ export const paths = {
       booking: `${ROOTS.DASHBOARD}/booking`,
       file: `${ROOTS.DASHBOARD}/file`,
     },
+    feedback: {
+      root: `${ROOTS.DASHBOARD}/feedback`,
+      list: `${ROOTS.DASHBOARD}/feedback/list`,
+      details: (id: string) => `${ROOTS.DASHBOARD}/feedback/${id}`,
+    },
     user: {
       root: `${ROOTS.DASHBOARD}/user`,
       new: `${ROOTS.DASHBOARD}/user/new`,
