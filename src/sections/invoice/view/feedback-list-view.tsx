@@ -92,9 +92,6 @@ export default function InvoiceListView() {
     comparator: getComparator(table.order, table.orderBy),
     filters,
   });
-  console.log('tableData', tableData);
-  console.log('filters', filters);
-  console.log('dataFiltered', dataFiltered);
 
   const dataInPage = dataFiltered.slice(
     table.page * table.rowsPerPage,
