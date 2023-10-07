@@ -53,22 +53,20 @@ export default function FeedbackTableRow({
           <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell>
 
-        <TableCell>{id}</TableCell>
-
         <TableCell>
           <Label
             variant="soft"
             color={
-              (type === 'positive' && 'success') || (type === 'negative' && 'warning') || 'default'
+              (type === 'positive' && 'success') || (type === 'negative' && 'error') || 'default'
             }
           >
             {type}
           </Label>
         </TableCell>
 
-        <TableCell>{element}</TableCell>
-
-        <TableCell>{description}</TableCell>
+        <TableCell>
+          <Label variant="soft">{element}</Label>
+        </TableCell>
 
         <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
           <Avatar alt={creator} sx={{ mr: 2 }}>
@@ -91,6 +89,12 @@ export default function FeedbackTableRow({
               typography: 'caption',
             }}
           />
+        </TableCell>
+
+        <TableCell>{description}</TableCell>
+
+        <TableCell>
+          <Label variant="soft">{issue}</Label>
         </TableCell>
 
         <TableCell align="right" sx={{ px: 1 }}>

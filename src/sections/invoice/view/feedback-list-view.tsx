@@ -53,12 +53,11 @@ import FeedbackTableFiltersResult from '../feedback-table-filters-result';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'id', label: 'Id' },
-  { id: 'type', label: 'Element' },
-  { id: 'element', label: 'Type' },
-  { id: 'description', label: 'Description' },
+  { id: 'type', label: 'Type' },
+  { id: 'element', label: 'Element' },
   { id: 'creator', label: 'User' },
   { id: 'createDate', label: 'Create' },
+  { id: 'description', label: 'Description' },
   { id: 'issue', label: 'Issue' },
   { id: '' },
 ];
@@ -93,6 +92,9 @@ export default function InvoiceListView() {
     comparator: getComparator(table.order, table.orderBy),
     filters,
   });
+  console.log('tableData', tableData);
+  console.log('filters', filters);
+  console.log('dataFiltered', dataFiltered);
 
   const dataInPage = dataFiltered.slice(
     table.page * table.rowsPerPage,
@@ -118,13 +120,13 @@ export default function InvoiceListView() {
       value: 'positive',
       label: 'Positive',
       color: 'success',
-      count: getFeedbackLength('paid'),
+      count: getFeedbackLength('positive'),
     },
     {
       value: 'negative',
       label: 'Negative',
       color: 'error',
-      count: getFeedbackLength('overdue'),
+      count: getFeedbackLength('negative'),
     },
   ] as const;
 
@@ -394,7 +396,7 @@ function applyFilter({
   }
 
   if (element !== '') {
-    inputData = inputData.filter((feedback) => feedback.issue === element);
+    inputData = inputData.filter((feedback) => feedback.element === element);
   }
 
   if (startDate) {

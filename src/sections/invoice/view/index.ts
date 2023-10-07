@@ -1,2 +1,2 @@
-export { default as InvoiceListView } from './invoice-list-view';;
-export { default as InvoiceDetailsView } from './invoice-details-view';
+export { default as InvoiceListView } from './feedback-list-view';;
+export { default as InvoiceDetailsView } from './feedback-details-view';

@@ -14,13 +14,13 @@ export const FEEDBACK_ISSUE_OPTIONS = [
 ];
 
 export const FEEDBACK_ELEMENT_OPTIONS = [
-  { value: 'component', label: 'Component' },
-  { value: 'page', label: 'Page' },
+  { value: 'component', label: 'component' },
+  { value: 'page', label: 'page' },
 ];
 
 export const _feedbacks = [...Array(20)].map((_, index) => {
   const type = index % 2 === 0 ? 'positive' : 'negative' ;
-  const issue = index % 2 === 0 ? 'RFC' : 'Bugfix' ;
+  const issue = index % 2 === 0 ? 'rfc' : 'bugfix' ;
   const element = index % 2 === 0 ? 'component' : 'page' ;
 
   return {

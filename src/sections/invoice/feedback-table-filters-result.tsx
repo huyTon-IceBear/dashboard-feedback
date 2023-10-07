@@ -59,7 +59,7 @@ export default function FeedbackTableFiltersResult({
       </Box>
 
       <Stack flexGrow={1} spacing={1} direction="row" flexWrap="wrap" alignItems="center">
-        {filters.issue && (
+        {filters.issue !== '' && (
           <Block label="Issue:">
             <Chip
               key={filters.issue}
@@ -70,13 +70,13 @@ export default function FeedbackTableFiltersResult({
           </Block>
         )}
 
-        {filters.element && (
-          <Block label="Service:">
+        {filters.element !== '' && (
+          <Block label="Element:">
             <Chip
               key={filters.element}
               label={filters.element}
               size="small"
-              onDelete={handleRemoveIssue}
+              onDelete={handleRemoveElement}
             />
           </Block>
         )}

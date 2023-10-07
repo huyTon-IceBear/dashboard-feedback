@@ -12,7 +12,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 // types
-import { Feedback, FeedbackTableFilters, FeedbackTableFilterValue } from 'src/types/feedback';
+import { FeedbackTableFilters, FeedbackTableFilterValue } from 'src/types/feedback';
 
 // components
 import Iconify from 'src/components/iconify';
@@ -82,28 +82,6 @@ export default function FeedbackTableToolbar({
             width: { xs: 1, md: 180 },
           }}
         >
-          <InputLabel>Issue</InputLabel>
-
-          <Select
-            value={filters.issue}
-            onChange={handleFilterIssue}
-            input={<OutlinedInput label="Issue" />}
-            sx={{ textTransform: 'capitalize' }}
-          >
-            {issueOptions.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl
-          sx={{
-            flexShrink: 0,
-            width: { xs: 1, md: 180 },
-          }}
-        >
           <InputLabel>Element</InputLabel>
 
           <Select
@@ -120,8 +98,30 @@ export default function FeedbackTableToolbar({
           </Select>
         </FormControl>
 
+        <FormControl
+          sx={{
+            flexShrink: 0,
+            width: { xs: 1, md: 180 },
+          }}
+        >
+          <InputLabel>Issue</InputLabel>
+
+          <Select
+            value={filters.issue}
+            onChange={handleFilterIssue}
+            input={<OutlinedInput label="Issue" />}
+            sx={{ textTransform: 'capitalize' }}
+          >
+            {issueOptions.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
         <DatePicker
-          label="Start date"
+          label="Create date"
           value={filters.startDate}
           onChange={handleFilterStartDate}
           slotProps={{ textField: { fullWidth: true } }}
