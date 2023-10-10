@@ -70,24 +70,6 @@ export default function InvoiceToolbar({
             </IconButton>
           </Tooltip>
 
-          {/* <PDFDownloadLink
-            document={<InvoicePDF invoice={invoice} currentStatus={currentStatus} />}
-            fileName={invoice.invoiceNumber}
-            style={{ textDecoration: 'none' }}
-          >
-            {({ loading }) => (
-              <Tooltip title="Download">
-                <IconButton>
-                  {loading ? (
-                    <CircularProgress size={24} color="inherit" />
-                  ) : (
-                    <Iconify icon="eva:cloud-download-fill" />
-                  )}
-                </IconButton>
-              </Tooltip>
-            )}
-          </PDFDownloadLink> */}
-
           <Tooltip title="Print">
             <IconButton>
               <Iconify icon="solar:printer-minimalistic-bold" />

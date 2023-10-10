@@ -8,7 +8,7 @@ import { paths } from 'src/routes/paths';
 import { useSettingsContext } from 'src/components/settings';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 //
-import ProductNewEditForm from '../product-new-edit-form';
+import ProductNewEditForm from '../rfc-new-edit-form';
 
 // ----------------------------------------------------------------------
 

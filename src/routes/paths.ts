@@ -93,6 +93,15 @@ export const paths = {
       list: `${ROOTS.DASHBOARD}/feedback/list`,
       details: (id: string) => `${ROOTS.DASHBOARD}/feedback/${id}`,
     },
+    task:{
+      root: `${ROOTS.DASHBOARD}/task`,
+      list: `${ROOTS.DASHBOARD}/task/list`,
+      details: (id: string) => `${ROOTS.DASHBOARD}/task/${id}`,
+      new:{
+        rfc: `${ROOTS.DASHBOARD}/task/rfc`,
+        bugfix: `${ROOTS.DASHBOARD}/task/bugfix`,
+      },
+    },
     user: {
       root: `${ROOTS.DASHBOARD}/user`,
       new: `${ROOTS.DASHBOARD}/user/new`,

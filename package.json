@@ -76,7 +76,7 @@
     "stylis": "^4.3.0",
     "stylis-plugin-rtl": "^2.1.1",
     "swr": "^2.2.2",
-    "yet-another-react-lightbox": "^3.12.1",
+    "yet-another-react-lightbox": "^3.13.0",
     "yup": "^1.2.0"
   },
   "devDependencies": {
