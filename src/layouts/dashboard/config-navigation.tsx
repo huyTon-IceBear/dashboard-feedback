@@ -68,8 +68,18 @@ export function useNavData() {
           },
           {
             title: t('Task'),
-            path: paths.dashboard.order.root,
+            path: paths.dashboard.task.root,
             icon: ICONS.order,
+            children: [
+              {
+                title: 'Create',
+                path: paths.dashboard.task.root,
+                children: [
+                  { title: 'Bugfix', path: paths.dashboard.task.new.bugfix },
+                  { title: 'RFC', path: paths.dashboard.task.new.rfc },
+                ],
+              },
+            ],
           },
           {
             title: t('blank'),

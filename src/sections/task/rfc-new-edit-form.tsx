@@ -5,118 +5,76 @@ import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
-import Switch from '@mui/material/Switch';
 import Divider from '@mui/material/Divider';
-import Grid from '@mui/material/Unstable_Grid2';
-import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
-import InputAdornment from '@mui/material/InputAdornment';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import MenuItem from '@mui/material/MenuItem';
-import Checkbox from '@mui/material/Checkbox';
-import TextField from '@mui/material/TextField';
-import InputLabel from '@mui/material/InputLabel';
-import IconButton from '@mui/material/IconButton';
-import FormControl from '@mui/material/FormControl';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+
 // routes
 import { paths } from 'src/routes/paths';
-// hooks
-import { useResponsive } from 'src/hooks/use-responsive';
 // _mock
-import {
-  _tags,
-  PRODUCT_SIZE_OPTIONS,
-  PRODUCT_GENDER_OPTIONS,
-  PRODUCT_COLOR_NAME_OPTIONS,
-  PRODUCT_CATEGORY_GROUP_OPTIONS,
-} from 'src/_mock';
+import { TASK_CLIENT_OPTIONS, TASK_USE_CASE_IMPACT_OPTIONS, TASK_PRIORITIES } from 'src/_mock';
 // components
 import { useSnackbar } from 'src/components/snackbar';
 import { useRouter } from 'src/routes/hooks';
 import FormProvider, {
   RHFSelect,
   RHFEditor,
-  RHFUpload,
-  RHFSwitch,
   RHFTextField,
-  RHFMultiSelect,
-  RHFAutocomplete,
-  RHFMultiCheckbox,
   RHFRadioGroup,
 } from 'src/components/hook-form';
 // types
-import { IProductItem } from 'src/types/product';
+import { Task } from 'src/types/task';
 
 // ----------------------------------------------------------------------
 
 type Props = {
-  currentProduct?: IProductItem;
+  currentTask?: Task;
 };
 
-export default function RFCTaskNewEditForm({ currentProduct }: Props) {
+export default function RFCTaskNewEditForm({ currentTask }: Props) {
   const router = useRouter();
-
-  const mdUp = useResponsive('up', 'md');
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const [includeTaxes, setIncludeTaxes] = useState(false);
-
-  const NewProductSchema = Yup.object().shape({
-    name: Yup.string().required('Name is required'),
+  const NewTaskSchema = Yup.object().shape({
     priority: Yup.string().required('Priority is required'),
-    medias: Yup.array().min(1, 'Images is required'),
-    tags: Yup.array().min(2, 'Must have at least 2 tags'),
-    category: Yup.string().required('Category is required'),
-    price: Yup.number().moreThan(0, 'Price should not be $0.00'),
+    priorityRequirement: Yup.string().required('Priority requirement is required'),
+    isBigClient: Yup.boolean().required('Field is required'),
+    clientEnvironment: Yup.string().required('Client environment name is required'),
+    useCaseImpact: Yup.string().required('Field is required'),
     description: Yup.string().required('Description is required'),
+    workDescription: Yup.string().required('Field is required'),
+    requirement: Yup.string().required('Requirements is required'),
     // not required
-    taxes: Yup.number(),
-    newLabel: Yup.object().shape({
-      enabled: Yup.boolean(),
-      content: Yup.string(),
-    }),
-    saleLabel: Yup.object().shape({
-      enabled: Yup.boolean(),
-      content: Yup.string(),
-    }),
+    clientName: Yup.string(),
+    clientRole: Yup.string(),
+    reason: Yup.string(),
+    goal: Yup.string(),
   });
 
   const defaultValues = useMemo(
     () => ({
-      name: currentProduct?.name || '',
-      priority: '',
-      description: currentProduct?.description || '',
-      description1: currentProduct?.description || '',
-      description2: currentProduct?.description || '',
-      description3: currentProduct?.description || '',
-      subDescription: currentProduct?.subDescription || '',
-      medias: currentProduct?.medias || [],
+      priority: currentTask?.priority || TASK_PRIORITIES[0].value,
+      priorityRequirement: currentTask?.priorityRequirement || TASK_PRIORITIES[0].options[0].value,
+      isBigClient: currentTask?.isBigClient || false,
+      clientEnvironment: currentTask?.clientEnvironment || '',
+      useCaseImpact: currentTask?.useCaseImpact || TASK_USE_CASE_IMPACT_OPTIONS[0].value,
+      description: currentTask?.description || '',
+      workDescription: currentTask?.workDescription || '',
+      requirement: currentTask?.requirement || '',
       //
-      code: currentProduct?.code || '',
-      sku: currentProduct?.sku || '',
-      price: currentProduct?.price || 0,
-      quantity: currentProduct?.quantity || 0,
-      priceSale: currentProduct?.priceSale || 0,
-      tags: currentProduct?.tags || [],
-      taxes: currentProduct?.taxes || 0,
-      gender: currentProduct?.gender || '',
-      category: currentProduct?.category || '',
-      colors: currentProduct?.colors || [],
-      sizes: currentProduct?.sizes || [],
-      newLabel: currentProduct?.newLabel || { enabled: false, content: '' },
-      saleLabel: currentProduct?.saleLabel || { enabled: false, content: '' },
+      clientName: currentTask?.clientName || '',
+      clientRole: currentTask?.clientRole || '',
+      reason: currentTask?.reason || '',
+      goal: currentTask?.goal || '',
     }),
-    [currentProduct]
+    [currentTask]
   );
 
   const methods = useForm({
-    resolver: yupResolver(NewProductSchema),
+    resolver: yupResolver(NewTaskSchema),
     defaultValues,
   });
 
@@ -130,74 +88,18 @@ export default function RFCTaskNewEditForm({ currentProduct }: Props) {
 
   const values = watch();
 
-  const BIG_CLIENT_OPTIONS = [
-    { value: true, label: 'Yes' },
-    { value: false, label: 'No' },
-  ];
-
-  const USE_CASE_IMPACT_OPTIONS = [
-    { value: 'Only this environment', label: 'Only this environment' },
-    {
-      value: 'All environments (all OpusFlow users)',
-      label: 'All environments (all OpusFlow users)',
-    },
-  ];
-
-  const priorities = [
-    {
-      label: 'High',
-      value: 'high',
-      options: [
-        { label: 'Unworkable process', value: 'Unworkable process' },
-        { label: 'Onboarding client', value: 'Onboarding client' },
-        { label: 'Prevention of churn', value: 'Prevention of churn' },
-        { label: 'Overdue promise', value: 'Overdue promise' },
-        { label: 'Other', value: 'Other' },
-      ],
-    },
-    {
-      label: 'Medium',
-      value: 'medium',
-      options: [
-        { label: 'Not immediately required', value: 'Not immediately required' },
-        {
-          label: 'Can currently be fixed through other means',
-          value: 'Can currently be fixed through other means',
-        },
-        { label: 'Feedback on UX- or UI flow', value: 'Feedback on UX- or UI flow' },
-        { label: 'Other', value: 'Other' },
-      ],
-    },
-    {
-      label: 'Low',
-      value: 'low',
-      options: [
-        { label: 'Nice to have', value: 'Nice to have' },
-        { label: 'Other', value: 'Other' },
-      ],
-    },
-  ];
-
   useEffect(() => {
-    if (currentProduct) {
+    if (currentTask) {
       reset(defaultValues);
     }
-  }, [currentProduct, defaultValues, reset]);
-
-  useEffect(() => {
-    if (includeTaxes) {
-      setValue('taxes', 0);
-    } else {
-      setValue('taxes', currentProduct?.taxes || 0);
-    }
-  }, [currentProduct?.taxes, includeTaxes, setValue]);
+  }, [currentTask, defaultValues, reset]);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));
       reset();
-      enqueueSnackbar(currentProduct ? 'Update success!' : 'Create success!');
-      router.push(paths.dashboard.product.root);
+      enqueueSnackbar('Create success!');
+      // router.push(paths.dashboard.task.root);
       console.info('DATA', data);
     } catch (error) {
       console.error(error);
@@ -205,7 +107,7 @@ export default function RFCTaskNewEditForm({ currentProduct }: Props) {
   });
 
   const getOptionsForPriority = (selected: string) => {
-    const selectedPriority = priorities.find((priority) => priority.value === selected);
+    const selectedPriority = TASK_PRIORITIES.find((priority) => priority.value === selected);
 
     // Check if the selected priority exists, and if so, return its options
     if (selectedPriority) {
@@ -213,35 +115,35 @@ export default function RFCTaskNewEditForm({ currentProduct }: Props) {
     }
 
     // If the selected priority doesn't exist, return options from the default priority (e.g., 'high')
-    return priorities[0].options;
+    return TASK_PRIORITIES[0].options;
   };
 
   const renderPriorities = (
     <Stack sx={{ width: 1 }}>
       <Typography variant="h6" sx={{ mb: 0.5, p: 3 }}>
-        Client details
+        Task details
       </Typography>
-      <Stack direction="row" sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Stack direction="row" alignItems="baseline" sx={{ mb: 1 }}>
+      <Stack direction="row" sx={{ px: 3 }} spacing={{ xs: 3, md: 5 }} minHeight={250}>
+        <Stack direction="row" alignItems="baseline" width={'100%'}>
           <Typography variant="body2">Priority as set for consultancy</Typography>
           <RHFSelect
             name="priority"
             label="Priority"
             InputLabelProps={{ shrink: true }}
             PaperPropsSx={{ textTransform: 'capitalize' }}
+            sx={{ px: 1.5, width: '20%' }}
           >
-            {priorities.map((option) => (
+            {TASK_PRIORITIES.map((option) => (
               <MenuItem key={option.value} value={option.value}>
                 {option.value}
               </MenuItem>
             ))}
           </RHFSelect>
-        </Stack>
-        <Stack direction="row" alignItems="baseline" sx={{ mb: 1 }}>
           <Typography variant="body2">required for: </Typography>
           <RHFRadioGroup
-            name="gender"
+            name="priorityRequirement"
             spacing={2}
+            sx={{ px: 2 }}
             options={getOptionsForPriority(values.priority)}
           />
         </Stack>
@@ -251,31 +153,47 @@ export default function RFCTaskNewEditForm({ currentProduct }: Props) {
 
   const renderDetails = (
     <Stack sx={{ width: 1 }}>
-      <Stack direction={'row'} sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
+      <Box
+        columnGap={2}
+        rowGap={3}
+        display="grid"
+        gridTemplateColumns={{
+          xs: 'repeat(1, 1fr)',
+          md: 'repeat(3, 1fr)',
+        }}
+        sx={{ p: 3 }}
+      >
         <Stack spacing={1}>
           <Typography variant="body2">Is this for a big client?*</Typography>
-          <RHFRadioGroup row spacing={4} name="experience" options={BIG_CLIENT_OPTIONS} />
+          <RHFRadioGroup row spacing={4} name="isBigClient" options={TASK_CLIENT_OPTIONS} />
         </Stack>
-
-        <Stack spacing={1.5}>
-          <Typography variant="subtitle2">Name client environment*</Typography>
-          <RHFTextField name="priceSale" placeholder="Type something..." />
+        <Stack spacing={1}>
+          <Typography variant="body2">Name client environment*</Typography>
+          <RHFTextField
+            name="clientEnvironment"
+            placeholder="Type something..."
+            sx={{ width: '70%' }}
+          />
         </Stack>
-      </Stack>
+        <Stack spacing={1}>
+          <Typography variant="body2">Use case impact*</Typography>
+          <RHFRadioGroup
+            row
+            spacing={4}
+            name="useCaseImpact"
+            options={TASK_USE_CASE_IMPACT_OPTIONS}
+          />
+        </Stack>
+      </Box>
 
-      <Stack direction={'row'} sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Typography variant="subtitle2">Use case impact*</Typography>
-        <RHFRadioGroup row spacing={4} name="experience" options={USE_CASE_IMPACT_OPTIONS} />
-      </Stack>
-
-      <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Typography variant="subtitle2">Description & Notes*</Typography>
-        <RHFEditor simple name="content" />
-      </Stack>
-
-      <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Typography variant="subtitle2">How should it work?*</Typography>
+      <Stack sx={{ p: 3 }} spacing={1}>
+        <Typography variant="body2">Description & Notes*</Typography>
         <RHFEditor simple name="description" />
+      </Stack>
+
+      <Stack sx={{ p: 3 }} spacing={1}>
+        <Typography variant="body2">How should it work?*</Typography>
+        <RHFEditor simple name="workDescription" />
       </Stack>
     </Stack>
   );
@@ -285,31 +203,40 @@ export default function RFCTaskNewEditForm({ currentProduct }: Props) {
       <Typography variant="h6" sx={{ mb: 0.5, p: 3 }}>
         Client details
       </Typography>
-      <Stack direction={'row'} sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
+      <Box
+        columnGap={2}
+        rowGap={3}
+        display="grid"
+        gridTemplateColumns={{
+          xs: 'repeat(1, 1fr)',
+          md: 'repeat(2, 1fr)',
+        }}
+        sx={{ p: 3 }}
+      >
         <Stack spacing={1}>
           <Typography variant="body2">Name & function client</Typography>
-          <RHFTextField name="priceSales2" placeholder="Type something..." />
+          <RHFTextField name="clientName" placeholder="Type something..." />
         </Stack>
 
         <Stack spacing={1}>
           <Typography variant="body2">This relates to the following user type / role</Typography>
-          <RHFTextField name="priceSales1" placeholder="Type something..." />
+          <RHFTextField name="clientRole" placeholder="Type something..." />
         </Stack>
+      </Box>
+
+      <Stack sx={{ p: 3 }} spacing={1}>
+        <Typography variant="body2">Why should it be added?</Typography>
+        <RHFEditor simple name="reason" />
       </Stack>
 
-      <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Typography variant="subtitle2">Why should it be added?</Typography>
-        <RHFEditor simple name="description3" />
+      <Stack sx={{ p: 3 }} spacing={1}>
+        <Typography variant="body2">What is the goal of the client for this feature</Typography>
+        <RHFEditor simple name="goal" />
       </Stack>
 
-      <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Typography variant="subtitle2">What is the goal of the client for this feature</Typography>
-        <RHFEditor simple name="description1" />
-      </Stack>
-
-      <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Typography variant="subtitle2">Requirements*</Typography>
-        <RHFEditor simple name="description2" />
+      <Stack sx={{ p: 3 }} spacing={1}>
+        <Typography variant="body2">Requirements*</Typography>
+        <RHFEditor simple name="requirement" />
       </Stack>
     </Stack>
   );
@@ -324,7 +251,7 @@ export default function RFCTaskNewEditForm({ currentProduct }: Props) {
       </Card>
       <Stack justifyContent="flex-end" direction="row" spacing={2} sx={{ mt: 3 }}>
         <LoadingButton type="submit" variant="contained" size="large" loading={isSubmitting}>
-          {!currentProduct ? 'Create Product' : 'Save Changes'}
+          {'Create Task'}
         </LoadingButton>
       </Stack>
     </FormProvider>
