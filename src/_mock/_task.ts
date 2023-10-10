@@ -48,3 +48,36 @@ export const TASK_PRIORITIES = [
     ],
   },
 ];
+
+
+export const TASK_SEVERITY_EFFECT_OPTIONS = [
+  { value: 'All users or environments.', label: 'All users or environments.' },
+  {
+    value: "Only one or a few customers' environments or users specify which Environment or user",
+    label: 'Only one or a few customers environments or users specify which Environment or user',
+  },
+];
+
+export const TASK_MODULES_OPTIONS = [
+  { value: 'My environment', label: 'My environment' },
+  { value: 'Planning', label: 'Planning' },
+  { value: 'CRM', label: 'CRM' },
+  { value: 'Forms', label: 'Forms' },
+  { value: 'Administration', label: 'Administration' },
+  { value: 'Stock', label: 'Stock' },
+  { value: 'Management', label: 'Management' },
+  { value: 'Project', label: 'Project' },
+];
+
+export const TASK_PRIORITY_OPTIONS = [
+  { label: 'Urgent', value: 'Urgent' },
+  { label: 'Medium', value: 'Medium' },
+  { label: 'Low', value: 'Low' },
+];
+
+export const TASK_SEVERITY_OPTIONS = [
+  { label: 'Critical', value: 'Critical' },
+  { label: 'Major', value: 'Major' },
+  { label: 'Minor', value: 'Minor' },
+  { label: 'Trivial', value: 'Trivial' },
+];

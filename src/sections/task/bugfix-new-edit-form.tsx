@@ -29,11 +29,10 @@ import { paths } from 'src/routes/paths';
 import { useResponsive } from 'src/hooks/use-responsive';
 // _mock
 import {
-  _tags,
-  PRODUCT_SIZE_OPTIONS,
-  PRODUCT_GENDER_OPTIONS,
-  PRODUCT_COLOR_NAME_OPTIONS,
-  PRODUCT_CATEGORY_GROUP_OPTIONS,
+  TASK_SEVERITY_EFFECT_OPTIONS,
+  TASK_MODULES_OPTIONS,
+  TASK_PRIORITY_OPTIONS,
+  TASK_SEVERITY_OPTIONS,
 } from 'src/_mock';
 // components
 import { useSnackbar } from 'src/components/snackbar';
@@ -50,73 +49,60 @@ import FormProvider, {
   RHFRadioGroup,
 } from 'src/components/hook-form';
 // types
-import { IProductItem } from 'src/types/product';
+import { TaskBugfix } from 'src/types/task';
 
 // ----------------------------------------------------------------------
 
 type Props = {
-  currentProduct?: IProductItem;
+  currentTask?: TaskBugfix;
 };
 
-export default function BugfixTaskNewEditForm({ currentProduct }: Props) {
+export default function BugfixTaskNewEditForm({ currentTask }: Props) {
   const router = useRouter();
 
   const mdUp = useResponsive('up', 'md');
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const [includeTaxes, setIncludeTaxes] = useState(false);
-
-  const NewProductSchema = Yup.object().shape({
-    name: Yup.string().required('Name is required'),
+  const NewTaskSchema = Yup.object().shape({
+    reportBy: Yup.string().required('Field is required'),
+    dateReported: Yup.string().required('Field is required'),
+    module: Yup.string().required('Field is required'),
+    severity: Yup.string().required('Field is required'),
+    severityEffect: Yup.string().required('Field is required'),
     priority: Yup.string().required('Priority is required'),
+    stepToProduce: Yup.string().required('Field is required'),
+    expectedResult: Yup.string().required('Field is required'),
+    actualResult: Yup.string().required('Field is required'),
     medias: Yup.array().min(1, 'medias is required'),
-    tags: Yup.array().min(2, 'Must have at least 2 tags'),
-    category: Yup.string().required('Category is required'),
-    price: Yup.number().moreThan(0, 'Price should not be $0.00'),
-    description: Yup.string().required('Description is required'),
     // not required
-    taxes: Yup.number(),
-    newLabel: Yup.object().shape({
-      enabled: Yup.boolean(),
-      content: Yup.string(),
-    }),
-    saleLabel: Yup.object().shape({
-      enabled: Yup.boolean(),
-      content: Yup.string(),
-    }),
+    description: Yup.string(),
+    preCondition: Yup.string(),
+    additionalInformation: Yup.string(),
   });
 
   const defaultValues = useMemo(
     () => ({
-      name: currentProduct?.name || '',
-      priority: '',
-      description: currentProduct?.description || '',
-      description1: currentProduct?.description || '',
-      description2: currentProduct?.description || '',
-      description3: currentProduct?.description || '',
-      subDescription: currentProduct?.subDescription || '',
-      medias: currentProduct?.medias || [],
+      reportBy: currentTask?.reportBy || '',
+      dateReported: currentTask?.dateReported || '',
+      module: currentTask?.module || TASK_MODULES_OPTIONS[0].value,
+      severity: currentTask?.severity || TASK_SEVERITY_OPTIONS[0].value,
+      severityEffect: currentTask?.severityEffect || TASK_SEVERITY_EFFECT_OPTIONS[0].value,
+      priority: currentTask?.severityEffect || TASK_PRIORITY_OPTIONS[0].value,
+      stepToProduce: currentTask?.stepToProduce || '',
+      expectedResult: currentTask?.expectedResult || '',
+      actualResult: currentTask?.actualResult || '',
+      medias: currentTask?.medias || [],
       //
-      code: currentProduct?.code || '',
-      sku: currentProduct?.sku || '',
-      price: currentProduct?.price || 0,
-      quantity: currentProduct?.quantity || 0,
-      priceSale: currentProduct?.priceSale || 0,
-      tags: currentProduct?.tags || [],
-      taxes: currentProduct?.taxes || 0,
-      gender: currentProduct?.gender || '',
-      category: currentProduct?.category || '',
-      colors: currentProduct?.colors || [],
-      sizes: currentProduct?.sizes || [],
-      newLabel: currentProduct?.newLabel || { enabled: false, content: '' },
-      saleLabel: currentProduct?.saleLabel || { enabled: false, content: '' },
+      description: currentTask?.description || '',
+      preCondition: currentTask?.preCondition || '',
+      additionalInformation: currentTask?.additionalInformation || '',
     }),
-    [currentProduct]
+    [currentTask]
   );
 
   const methods = useForm({
-    resolver: yupResolver(NewProductSchema),
+    resolver: yupResolver(NewTaskSchema),
     defaultValues,
   });
 
@@ -130,58 +116,18 @@ export default function BugfixTaskNewEditForm({ currentProduct }: Props) {
 
   const values = watch();
 
-  const serverity_effect_OPTIONS = [
-    { value: 'All users or environments.', label: 'All users or environments.' },
-    {
-      value: "Only one or a few customers' environments or users specify which Environment or user",
-      label: 'Only one or a few customers environments or users specify which Environment or user',
-    },
-  ];
-
-  const MODULES_OPTIONS = [
-    { value: 'My environment', label: 'My environment' },
-    { value: 'Planning', label: 'Planning' },
-    { value: 'CRM', label: 'CRM' },
-    { value: 'Forms', label: 'Forms' },
-    { value: 'Administration', label: 'Administration' },
-    { value: 'Stock', label: 'Stock' },
-    { value: 'Management', label: 'Management' },
-    { value: 'Project', label: 'Project' },
-  ];
-
-  const priorities = [
-    { label: 'Urgent', value: 'Urgent' },
-    { label: 'Medium', value: 'Medium' },
-    { label: 'Low', value: 'Low' },
-  ];
-
-  const Severities = [
-    { label: 'Critical', value: 'Critical' },
-    { label: 'Major', value: 'Major' },
-    { label: 'Minor', value: 'Minor' },
-    { label: 'Trivial', value: 'Trivial' },
-  ];
-
   useEffect(() => {
-    if (currentProduct) {
+    if (currentTask) {
       reset(defaultValues);
     }
-  }, [currentProduct, defaultValues, reset]);
-
-  useEffect(() => {
-    if (includeTaxes) {
-      setValue('taxes', 0);
-    } else {
-      setValue('taxes', currentProduct?.taxes || 0);
-    }
-  }, [currentProduct?.taxes, includeTaxes, setValue]);
+  }, [currentTask, defaultValues, reset]);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));
       reset();
-      enqueueSnackbar(currentProduct ? 'Update success!' : 'Create success!');
-      router.push(paths.dashboard.product.root);
+      enqueueSnackbar('Create success!');
+      // router.push(paths.dashboard.task.root);
       console.info('DATA', data);
     } catch (error) {
       console.error(error);
@@ -218,78 +164,98 @@ export default function BugfixTaskNewEditForm({ currentProduct }: Props) {
   const renderDetails = (
     <Stack sx={{ width: 1 }}>
       <Typography variant="h6" sx={{ mb: 0.5, p: 3 }}>
-        Client details
+        Task details
       </Typography>
-      <Stack direction="row" sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
+      <Box
+        columnGap={2}
+        rowGap={3}
+        display="grid"
+        gridTemplateColumns={{
+          xs: 'repeat(1, 1fr)',
+          md: 'repeat(3, 1fr)',
+        }}
+        sx={{ p: 3 }}
+      >
         <Stack alignItems="baseline" sx={{ mb: 1 }}>
           <Typography variant="subtitle2">Reported by</Typography>
-          <RHFTextField name="priceSale" placeholder="Type something..." />
+          <RHFTextField name="reportBy" placeholder="Type something..." />
         </Stack>
         <Stack alignItems="baseline" sx={{ mb: 1 }}>
           <Typography variant="subtitle2">Date reported</Typography>
-          <RHFTextField name="priceSale" placeholder="Type something..." />
+          <RHFTextField name="dateReported" placeholder="Type something..." />
         </Stack>
-      </Stack>
-      <Stack alignItems="baseline" sx={{ mb: 1 }}>
+      </Box>
+      <Stack sx={{ p: 3 }} spacing={1}>
         <Typography variant="subtitle2">Application/Module*</Typography>
-        <RHFRadioGroup row spacing={4} name="experience" options={MODULES_OPTIONS} />
+        <RHFRadioGroup row spacing={4} name="module" options={TASK_MODULES_OPTIONS} />
       </Stack>
-      <Stack direction="row" sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Stack alignItems="baseline" sx={{ mb: 1 }}>
-          <Typography variant="subtitle2">Severity*</Typography>
-          <RHFSelect
-            name="priority"
-            label="Priority"
-            InputLabelProps={{ shrink: true }}
-            PaperPropsSx={{ textTransform: 'capitalize' }}
-          >
-            {Severities.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </RHFSelect>
-        </Stack>
-        <Stack alignItems="baseline" sx={{ mb: 1 }}>
-          <RHFRadioGroup row spacing={4} name="experience" options={serverity_effect_OPTIONS} />
-        </Stack>
-      </Stack>
-      <Stack direction="row" sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Stack alignItems="baseline" sx={{ mb: 1 }}>
-          <Typography variant="subtitle2">Priority*</Typography>
-          <RHFSelect
-            name="priority"
-            label="Priority"
-            InputLabelProps={{ shrink: true }}
-            PaperPropsSx={{ textTransform: 'capitalize' }}
-          >
-            {priorities.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </RHFSelect>
-        </Stack>
-        <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-          <Typography variant="subtitle2">Pre-conditions</Typography>
-          <RHFEditor simple name="description2" />
-        </Stack>
-      </Stack>
-      <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Typography variant="subtitle2">Step to Reproduce*</Typography>
+      <Stack sx={{ p: 3 }} spacing={1}>
+        <Typography variant="subtitle2">Description</Typography>
         <RHFEditor simple name="description" />
       </Stack>
       <Stack direction="row" sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Stack alignItems="baseline" sx={{ mb: 1 }}>
-          <Typography variant="subtitle2">Expected Result*</Typography>
-          <RHFEditor simple name="description1" />
-        </Stack>
-        <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-          <Typography variant="subtitle2">Actual Result*</Typography>
-          <RHFEditor simple name="description3" />
+        <Stack direction="row" alignItems="baseline" width={'100%'}>
+          <Typography variant="subtitle2">Severity*</Typography>
+          <RHFSelect
+            name="severity"
+            label="Severity"
+            InputLabelProps={{ shrink: true }}
+            PaperPropsSx={{ textTransform: 'capitalize' }}
+            sx={{ px: 1.5, width: '20%' }}
+          >
+            {TASK_SEVERITY_OPTIONS.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </RHFSelect>
+          <RHFRadioGroup spacing={4} name="severityEffect" options={TASK_SEVERITY_EFFECT_OPTIONS} />
         </Stack>
       </Stack>
-      <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
+      <Stack direction="row" spacing={1}>
+        <Stack spacing={1} sx={{ p: 3, width: '40%' }}>
+          <Typography variant="subtitle2">Priority*</Typography>
+          <RHFSelect
+            name="priority"
+            InputLabelProps={{ shrink: true }}
+            PaperPropsSx={{ textTransform: 'capitalize' }}
+          >
+            {TASK_PRIORITY_OPTIONS.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </RHFSelect>
+        </Stack>
+        <Stack spacing={1} sx={{ p: 3, width: '60%' }}>
+          <Typography variant="subtitle2">Pre-conditions</Typography>
+          <RHFEditor simple name="preCondition" />
+        </Stack>
+      </Stack>
+      <Stack sx={{ p: 3 }} spacing={1}>
+        <Typography variant="subtitle2">Step to Reproduce*</Typography>
+        <RHFEditor simple name="stepToProduce" />
+      </Stack>
+      <Box
+        columnGap={5}
+        rowGap={3}
+        display="grid"
+        gridTemplateColumns={{
+          xs: 'repeat(1, 1fr)',
+          md: 'repeat(2, 1fr)',
+        }}
+        sx={{ p: 3 }}
+      >
+        <Stack spacing={1}>
+          <Typography variant="subtitle2">Expected Result*</Typography>
+          <RHFEditor simple name="expectedResult" />
+        </Stack>
+        <Stack spacing={1}>
+          <Typography variant="subtitle2">Actual Result*</Typography>
+          <RHFEditor simple name="actualResult" />
+        </Stack>
+      </Box>
+      <Stack sx={{ p: 3 }} spacing={1}>
         <Typography variant="subtitle2">Screenshots/Video*</Typography>
         <RHFUpload
           multiple
@@ -303,9 +269,9 @@ export default function BugfixTaskNewEditForm({ currentProduct }: Props) {
           onUpload={() => console.info('ON UPLOAD')}
         />
       </Stack>
-      <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
+      <Stack sx={{ p: 3 }} spacing={1}>
         <Typography variant="subtitle2">Additional Information</Typography>
-        <RHFEditor simple name="sub-description3" />
+        <RHFEditor simple name="additionalInformation" />
       </Stack>
     </Stack>
   );
@@ -315,7 +281,7 @@ export default function BugfixTaskNewEditForm({ currentProduct }: Props) {
       <Card>{renderDetails}</Card>
       <Stack justifyContent="flex-end" direction="row" spacing={2} sx={{ mt: 3 }}>
         <LoadingButton type="submit" variant="contained" size="large" loading={isSubmitting}>
-          {!currentProduct ? 'Create Product' : 'Save Changes'}
+          {'Create Product'}
         </LoadingButton>
       </Stack>
     </FormProvider>

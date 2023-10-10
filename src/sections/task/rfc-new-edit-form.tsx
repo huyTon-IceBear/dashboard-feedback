@@ -25,12 +25,12 @@ import FormProvider, {
   RHFRadioGroup,
 } from 'src/components/hook-form';
 // types
-import { Task } from 'src/types/task';
+import { TaskRFC } from 'src/types/task';
 
 // ----------------------------------------------------------------------
 
 type Props = {
-  currentTask?: Task;
+  currentTask?: TaskRFC;
 };
 
 export default function RFCTaskNewEditForm({ currentTask }: Props) {
@@ -125,7 +125,7 @@ export default function RFCTaskNewEditForm({ currentTask }: Props) {
       </Typography>
       <Stack direction="row" sx={{ px: 3 }} spacing={{ xs: 3, md: 5 }} minHeight={250}>
         <Stack direction="row" alignItems="baseline" width={'100%'}>
-          <Typography variant="body2">Priority as set for consultancy</Typography>
+          <Typography variant="subtitle2">Priority as set for consultancy</Typography>
           <RHFSelect
             name="priority"
             label="Priority"
@@ -139,7 +139,7 @@ export default function RFCTaskNewEditForm({ currentTask }: Props) {
               </MenuItem>
             ))}
           </RHFSelect>
-          <Typography variant="body2">required for: </Typography>
+          <Typography variant="subtitle2">required for: </Typography>
           <RHFRadioGroup
             name="priorityRequirement"
             spacing={2}
@@ -164,11 +164,11 @@ export default function RFCTaskNewEditForm({ currentTask }: Props) {
         sx={{ p: 3 }}
       >
         <Stack spacing={1}>
-          <Typography variant="body2">Is this for a big client?*</Typography>
+          <Typography variant="subtitle2">Is this for a big client?*</Typography>
           <RHFRadioGroup row spacing={4} name="isBigClient" options={TASK_CLIENT_OPTIONS} />
         </Stack>
         <Stack spacing={1}>
-          <Typography variant="body2">Name client environment*</Typography>
+          <Typography variant="subtitle2">Name client environment*</Typography>
           <RHFTextField
             name="clientEnvironment"
             placeholder="Type something..."
@@ -176,7 +176,7 @@ export default function RFCTaskNewEditForm({ currentTask }: Props) {
           />
         </Stack>
         <Stack spacing={1}>
-          <Typography variant="body2">Use case impact*</Typography>
+          <Typography variant="subtitle2">Use case impact*</Typography>
           <RHFRadioGroup
             row
             spacing={4}
@@ -187,12 +187,12 @@ export default function RFCTaskNewEditForm({ currentTask }: Props) {
       </Box>
 
       <Stack sx={{ p: 3 }} spacing={1}>
-        <Typography variant="body2">Description & Notes*</Typography>
+        <Typography variant="subtitle2">Description & Notes*</Typography>
         <RHFEditor simple name="description" />
       </Stack>
 
       <Stack sx={{ p: 3 }} spacing={1}>
-        <Typography variant="body2">How should it work?*</Typography>
+        <Typography variant="subtitle2">How should it work?*</Typography>
         <RHFEditor simple name="workDescription" />
       </Stack>
     </Stack>
@@ -214,28 +214,30 @@ export default function RFCTaskNewEditForm({ currentTask }: Props) {
         sx={{ p: 3 }}
       >
         <Stack spacing={1}>
-          <Typography variant="body2">Name & function client</Typography>
+          <Typography variant="subtitle2">Name & function client</Typography>
           <RHFTextField name="clientName" placeholder="Type something..." />
         </Stack>
 
         <Stack spacing={1}>
-          <Typography variant="body2">This relates to the following user type / role</Typography>
+          <Typography variant="subtitle2">
+            This relates to the following user type / role
+          </Typography>
           <RHFTextField name="clientRole" placeholder="Type something..." />
         </Stack>
       </Box>
 
       <Stack sx={{ p: 3 }} spacing={1}>
-        <Typography variant="body2">Why should it be added?</Typography>
+        <Typography variant="subtitle2">Why should it be added?</Typography>
         <RHFEditor simple name="reason" />
       </Stack>
 
       <Stack sx={{ p: 3 }} spacing={1}>
-        <Typography variant="body2">What is the goal of the client for this feature</Typography>
+        <Typography variant="subtitle2">What is the goal of the client for this feature</Typography>
         <RHFEditor simple name="goal" />
       </Stack>
 
       <Stack sx={{ p: 3 }} spacing={1}>
-        <Typography variant="body2">Requirements*</Typography>
+        <Typography variant="subtitle2">Requirements*</Typography>
         <RHFEditor simple name="requirement" />
       </Stack>
     </Stack>
