@@ -70,7 +70,7 @@ export default function BugfixTaskNewEditForm({ currentProduct }: Props) {
   const NewProductSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
     priority: Yup.string().required('Priority is required'),
-    images: Yup.array().min(1, 'Images is required'),
+    medias: Yup.array().min(1, 'medias is required'),
     tags: Yup.array().min(2, 'Must have at least 2 tags'),
     category: Yup.string().required('Category is required'),
     price: Yup.number().moreThan(0, 'Price should not be $0.00'),
@@ -96,7 +96,7 @@ export default function BugfixTaskNewEditForm({ currentProduct }: Props) {
       description2: currentProduct?.description || '',
       description3: currentProduct?.description || '',
       subDescription: currentProduct?.subDescription || '',
-      images: currentProduct?.images || [],
+      medias: currentProduct?.medias || [],
       //
       code: currentProduct?.code || '',
       sku: currentProduct?.sku || '',
@@ -130,52 +130,36 @@ export default function BugfixTaskNewEditForm({ currentProduct }: Props) {
 
   const values = watch();
 
-  const BIG_CLIENT_OPTIONS = [
-    { value: true, label: 'Yes' },
-    { value: false, label: 'No' },
+  const serverity_effect_OPTIONS = [
+    { value: 'All users or environments.', label: 'All users or environments.' },
+    {
+      value: "Only one or a few customers' environments or users specify which Environment or user",
+      label: 'Only one or a few customers environments or users specify which Environment or user',
+    },
   ];
 
-  const USE_CASE_IMPACT_OPTIONS = [
-    { value: 'Only this environment', label: 'Only this environment' },
-    {
-      value: 'All environments (all OpusFlow users)',
-      label: 'All environments (all OpusFlow users)',
-    },
+  const MODULES_OPTIONS = [
+    { value: 'My environment', label: 'My environment' },
+    { value: 'Planning', label: 'Planning' },
+    { value: 'CRM', label: 'CRM' },
+    { value: 'Forms', label: 'Forms' },
+    { value: 'Administration', label: 'Administration' },
+    { value: 'Stock', label: 'Stock' },
+    { value: 'Management', label: 'Management' },
+    { value: 'Project', label: 'Project' },
   ];
 
   const priorities = [
-    {
-      label: 'High',
-      value: 'high',
-      options: [
-        { label: 'Unworkable process', value: 'Unworkable process' },
-        { label: 'Onboarding client', value: 'Onboarding client' },
-        { label: 'Prevention of churn', value: 'Prevention of churn' },
-        { label: 'Overdue promise', value: 'Overdue promise' },
-        { label: 'Other', value: 'Other' },
-      ],
-    },
-    {
-      label: 'Medium',
-      value: 'medium',
-      options: [
-        { label: 'Not immediately required', value: 'Not immediately required' },
-        {
-          label: 'Can currently be fixed through other means',
-          value: 'Can currently be fixed through other means',
-        },
-        { label: 'Feedback on UX- or UI flow', value: 'Feedback on UX- or UI flow' },
-        { label: 'Other', value: 'Other' },
-      ],
-    },
-    {
-      label: 'Low',
-      value: 'low',
-      options: [
-        { label: 'Nice to have', value: 'Nice to have' },
-        { label: 'Other', value: 'Other' },
-      ],
-    },
+    { label: 'Urgent', value: 'Urgent' },
+    { label: 'Medium', value: 'Medium' },
+    { label: 'Low', value: 'Low' },
+  ];
+
+  const Severities = [
+    { label: 'Critical', value: 'Critical' },
+    { label: 'Major', value: 'Major' },
+    { label: 'Minor', value: 'Minor' },
+    { label: 'Trivial', value: 'Trivial' },
   ];
 
   useEffect(() => {
@@ -206,7 +190,7 @@ export default function BugfixTaskNewEditForm({ currentProduct }: Props) {
 
   const handleDrop = useCallback(
     (acceptedFiles: File[]) => {
-      const files = values.images || [];
+      const files = values.medias || [];
 
       const newFiles = acceptedFiles.map((file) =>
         Object.assign(file, {
@@ -214,136 +198,121 @@ export default function BugfixTaskNewEditForm({ currentProduct }: Props) {
         })
       );
 
-      setValue('images', [...files, ...newFiles], { shouldValidate: true });
+      setValue('medias', [...files, ...newFiles], { shouldValidate: true });
     },
-    [setValue, values.images]
+    [setValue, values.medias]
   );
 
   const handleRemoveFile = useCallback(
     (inputFile: File | string) => {
-      const filtered = values.images && values.images?.filter((file) => file !== inputFile);
-      setValue('images', filtered);
+      const filtered = values.medias && values.medias?.filter((file) => file !== inputFile);
+      setValue('medias', filtered);
     },
-    [setValue, values.images]
+    [setValue, values.medias]
   );
 
   const handleRemoveAllFiles = useCallback(() => {
-    setValue('images', []);
+    setValue('medias', []);
   }, [setValue]);
 
-  const handleChangeIncludeTaxes = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setIncludeTaxes(event.target.checked);
-  }, []);
-
-  const getOptionsForPriority = (selected: string) => {
-    const selectedPriority = priorities.find((priority) => priority.value === selected);
-
-    // Check if the selected priority exists, and if so, return its options
-    if (selectedPriority) {
-      return selectedPriority.options;
-    }
-
-    // If the selected priority doesn't exist, return options from the default priority (e.g., 'high')
-    return priorities[0].options;
-  };
-
-  const renderPriorities = (
-    <Stack direction="row" sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-      <Stack direction="row" alignItems="baseline" sx={{ mb: 1 }}>
-        <Typography variant="body2">Priority as set for consultancy</Typography>
-        <RHFSelect
-          name="priority"
-          label="Priority"
-          InputLabelProps={{ shrink: true }}
-          PaperPropsSx={{ textTransform: 'capitalize' }}
-        >
-          {priorities.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.value}
-            </MenuItem>
-          ))}
-        </RHFSelect>
-      </Stack>
-      <Stack direction="row" alignItems="baseline" sx={{ mb: 1 }}>
-        <Typography variant="body2">required for: </Typography>
-        <RHFRadioGroup name="gender" spacing={2} options={getOptionsForPriority(values.priority)} />
-      </Stack>
-    </Stack>
-  );
-
   const renderDetails = (
-    <Stack sx={{ width: 1 }}>
-      <Stack direction={'row'} sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Stack spacing={1}>
-          <Typography variant="body2">Is this for a big client?*</Typography>
-          <RHFRadioGroup row spacing={4} name="experience" options={BIG_CLIENT_OPTIONS} />
-        </Stack>
-
-        <Stack spacing={1.5}>
-          <Typography variant="subtitle2">Name client environment*</Typography>
-          <RHFTextField name="priceSale" placeholder="Type something..." />
-        </Stack>
-      </Stack>
-
-      <Stack direction={'row'} sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Typography variant="subtitle2">Use case impact*</Typography>
-        <RHFRadioGroup row spacing={4} name="experience" options={USE_CASE_IMPACT_OPTIONS} />
-      </Stack>
-
-      <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Typography variant="subtitle2">Description & Notes*</Typography>
-        <RHFEditor simple name="content" />
-      </Stack>
-
-      <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Typography variant="subtitle2">How should it work?*</Typography>
-        <RHFEditor simple name="description" />
-      </Stack>
-    </Stack>
-  );
-
-  const renderClientDetails = (
     <Stack sx={{ width: 1 }}>
       <Typography variant="h6" sx={{ mb: 0.5, p: 3 }}>
         Client details
       </Typography>
-      <Stack direction={'row'} sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Stack spacing={1}>
-          <Typography variant="body2">Name & function client</Typography>
-          <RHFTextField name="priceSales2" placeholder="Type something..." />
+      <Stack direction="row" sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
+        <Stack alignItems="baseline" sx={{ mb: 1 }}>
+          <Typography variant="subtitle2">Reported by</Typography>
+          <RHFTextField name="priceSale" placeholder="Type something..." />
         </Stack>
-
-        <Stack spacing={1}>
-          <Typography variant="body2">This relates to the following user type / role</Typography>
-          <RHFTextField name="priceSales1" placeholder="Type something..." />
+        <Stack alignItems="baseline" sx={{ mb: 1 }}>
+          <Typography variant="subtitle2">Date reported</Typography>
+          <RHFTextField name="priceSale" placeholder="Type something..." />
         </Stack>
       </Stack>
-
-      <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Typography variant="subtitle2">Why should it be added?</Typography>
-        <RHFEditor simple name="description3" />
+      <Stack alignItems="baseline" sx={{ mb: 1 }}>
+        <Typography variant="subtitle2">Application/Module*</Typography>
+        <RHFRadioGroup row spacing={4} name="experience" options={MODULES_OPTIONS} />
       </Stack>
-
-      <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Typography variant="subtitle2">What is the goal of the client for this feature</Typography>
-        <RHFEditor simple name="description1" />
+      <Stack direction="row" sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
+        <Stack alignItems="baseline" sx={{ mb: 1 }}>
+          <Typography variant="subtitle2">Severity*</Typography>
+          <RHFSelect
+            name="priority"
+            label="Priority"
+            InputLabelProps={{ shrink: true }}
+            PaperPropsSx={{ textTransform: 'capitalize' }}
+          >
+            {Severities.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </RHFSelect>
+        </Stack>
+        <Stack alignItems="baseline" sx={{ mb: 1 }}>
+          <RHFRadioGroup row spacing={4} name="experience" options={serverity_effect_OPTIONS} />
+        </Stack>
       </Stack>
-
+      <Stack direction="row" sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
+        <Stack alignItems="baseline" sx={{ mb: 1 }}>
+          <Typography variant="subtitle2">Priority*</Typography>
+          <RHFSelect
+            name="priority"
+            label="Priority"
+            InputLabelProps={{ shrink: true }}
+            PaperPropsSx={{ textTransform: 'capitalize' }}
+          >
+            {priorities.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </RHFSelect>
+        </Stack>
+        <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
+          <Typography variant="subtitle2">Pre-conditions</Typography>
+          <RHFEditor simple name="description2" />
+        </Stack>
+      </Stack>
       <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-        <Typography variant="subtitle2">Requirements*</Typography>
-        <RHFEditor simple name="description2" />
+        <Typography variant="subtitle2">Step to Reproduce*</Typography>
+        <RHFEditor simple name="description" />
+      </Stack>
+      <Stack direction="row" sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
+        <Stack alignItems="baseline" sx={{ mb: 1 }}>
+          <Typography variant="subtitle2">Expected Result*</Typography>
+          <RHFEditor simple name="description1" />
+        </Stack>
+        <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
+          <Typography variant="subtitle2">Actual Result*</Typography>
+          <RHFEditor simple name="description3" />
+        </Stack>
+      </Stack>
+      <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
+        <Typography variant="subtitle2">Screenshots/Video*</Typography>
+        <RHFUpload
+          multiple
+          thumbnail
+          name="medias"
+          accept={{}}
+          maxSize={3145728}
+          onDrop={handleDrop}
+          onRemove={handleRemoveFile}
+          onRemoveAll={handleRemoveAllFiles}
+          onUpload={() => console.info('ON UPLOAD')}
+        />
+      </Stack>
+      <Stack sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
+        <Typography variant="subtitle2">Additional Information</Typography>
+        <RHFEditor simple name="sub-description3" />
       </Stack>
     </Stack>
   );
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
-      <Card>
-        {renderPriorities}
-        {renderDetails}
-        <Divider />
-        {renderClientDetails}
-      </Card>
+      <Card>{renderDetails}</Card>
       <Stack justifyContent="flex-end" direction="row" spacing={2} sx={{ mt: 3 }}>
         <LoadingButton type="submit" variant="contained" size="large" loading={isSubmitting}>
           {!currentProduct ? 'Create Product' : 'Save Changes'}

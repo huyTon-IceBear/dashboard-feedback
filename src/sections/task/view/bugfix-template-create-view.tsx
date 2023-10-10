@@ -8,34 +8,34 @@ import { paths } from 'src/routes/paths';
 import { useSettingsContext } from 'src/components/settings';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 //
-import ProductNewEditForm from '../rfc-new-edit-form';
+import BugfixTaskNewEditForm from '../bugfix-new-edit-form';
 
 // ----------------------------------------------------------------------
 
-export default function ProductCreateView() {
+export default function BugfixTemplateCreateView() {
   const settings = useSettingsContext();
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
       <CustomBreadcrumbs
-        heading="Create a new product"
+        heading="Bugfix template"
         links={[
           {
             name: 'Dashboard',
             href: paths.dashboard.root,
           },
           {
-            name: 'Product',
-            href: paths.dashboard.product.root,
+            name: 'Task',
+            href: paths.dashboard.task.root,
           },
-          { name: 'New product' },
+          { name: 'New Task' },
         ]}
         sx={{
           mb: { xs: 3, md: 5 },
         }}
       />
 
-      <ProductNewEditForm />
+      <BugfixTaskNewEditForm />
     </Container>
   );
 }

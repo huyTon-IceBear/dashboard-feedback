@@ -43,7 +43,7 @@ export type IProductItem = {
   sizes: string[];
   publish: string;
   coverUrl: string;
-  images: string[];
+  medias: string[];
   colors: string[];
   quantity: number;
   category: string;

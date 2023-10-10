@@ -18,7 +18,7 @@ export default function RFCTemplateCreateView() {
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
       <CustomBreadcrumbs
-        heading="Create a new task by RFC template"
+        heading="RFC template"
         links={[
           {
             name: 'Dashboard',

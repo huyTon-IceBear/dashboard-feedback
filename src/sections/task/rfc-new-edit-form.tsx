@@ -70,7 +70,7 @@ export default function RFCTaskNewEditForm({ currentProduct }: Props) {
   const NewProductSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
     priority: Yup.string().required('Priority is required'),
-    images: Yup.array().min(1, 'Images is required'),
+    medias: Yup.array().min(1, 'Images is required'),
     tags: Yup.array().min(2, 'Must have at least 2 tags'),
     category: Yup.string().required('Category is required'),
     price: Yup.number().moreThan(0, 'Price should not be $0.00'),
@@ -96,7 +96,7 @@ export default function RFCTaskNewEditForm({ currentProduct }: Props) {
       description2: currentProduct?.description || '',
       description3: currentProduct?.description || '',
       subDescription: currentProduct?.subDescription || '',
-      images: currentProduct?.images || [],
+      medias: currentProduct?.medias || [],
       //
       code: currentProduct?.code || '',
       sku: currentProduct?.sku || '',
@@ -204,37 +204,6 @@ export default function RFCTaskNewEditForm({ currentProduct }: Props) {
     }
   });
 
-  const handleDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      const files = values.images || [];
-
-      const newFiles = acceptedFiles.map((file) =>
-        Object.assign(file, {
-          preview: URL.createObjectURL(file),
-        })
-      );
-
-      setValue('images', [...files, ...newFiles], { shouldValidate: true });
-    },
-    [setValue, values.images]
-  );
-
-  const handleRemoveFile = useCallback(
-    (inputFile: File | string) => {
-      const filtered = values.images && values.images?.filter((file) => file !== inputFile);
-      setValue('images', filtered);
-    },
-    [setValue, values.images]
-  );
-
-  const handleRemoveAllFiles = useCallback(() => {
-    setValue('images', []);
-  }, [setValue]);
-
-  const handleChangeIncludeTaxes = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setIncludeTaxes(event.target.checked);
-  }, []);
-
   const getOptionsForPriority = (selected: string) => {
     const selectedPriority = priorities.find((priority) => priority.value === selected);
 
@@ -248,25 +217,34 @@ export default function RFCTaskNewEditForm({ currentProduct }: Props) {
   };
 
   const renderPriorities = (
-    <Stack direction="row" sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
-      <Stack direction="row" alignItems="baseline" sx={{ mb: 1 }}>
-        <Typography variant="body2">Priority as set for consultancy</Typography>
-        <RHFSelect
-          name="priority"
-          label="Priority"
-          InputLabelProps={{ shrink: true }}
-          PaperPropsSx={{ textTransform: 'capitalize' }}
-        >
-          {priorities.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.value}
-            </MenuItem>
-          ))}
-        </RHFSelect>
-      </Stack>
-      <Stack direction="row" alignItems="baseline" sx={{ mb: 1 }}>
-        <Typography variant="body2">required for: </Typography>
-        <RHFRadioGroup name="gender" spacing={2} options={getOptionsForPriority(values.priority)} />
+    <Stack sx={{ width: 1 }}>
+      <Typography variant="h6" sx={{ mb: 0.5, p: 3 }}>
+        Client details
+      </Typography>
+      <Stack direction="row" sx={{ p: 3 }} spacing={{ xs: 3, md: 5 }}>
+        <Stack direction="row" alignItems="baseline" sx={{ mb: 1 }}>
+          <Typography variant="body2">Priority as set for consultancy</Typography>
+          <RHFSelect
+            name="priority"
+            label="Priority"
+            InputLabelProps={{ shrink: true }}
+            PaperPropsSx={{ textTransform: 'capitalize' }}
+          >
+            {priorities.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.value}
+              </MenuItem>
+            ))}
+          </RHFSelect>
+        </Stack>
+        <Stack direction="row" alignItems="baseline" sx={{ mb: 1 }}>
+          <Typography variant="body2">required for: </Typography>
+          <RHFRadioGroup
+            name="gender"
+            spacing={2}
+            options={getOptionsForPriority(values.priority)}
+          />
+        </Stack>
       </Stack>
     </Stack>
   );
