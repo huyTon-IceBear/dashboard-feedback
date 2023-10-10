@@ -41,11 +41,7 @@ import FormProvider, {
   RHFSelect,
   RHFEditor,
   RHFUpload,
-  RHFSwitch,
   RHFTextField,
-  RHFMultiSelect,
-  RHFAutocomplete,
-  RHFMultiCheckbox,
   RHFRadioGroup,
 } from 'src/components/hook-form';
 // types

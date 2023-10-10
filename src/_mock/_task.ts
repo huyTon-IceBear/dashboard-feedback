@@ -67,6 +67,7 @@ export const TASK_MODULES_OPTIONS = [
   { value: 'Stock', label: 'Stock' },
   { value: 'Management', label: 'Management' },
   { value: 'Project', label: 'Project' },
+  { value: 'Other', label: 'Other' },
 ];
 
 export const TASK_PRIORITY_OPTIONS = [
