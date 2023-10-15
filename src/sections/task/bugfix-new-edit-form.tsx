@@ -5,25 +5,11 @@ import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
-import Switch from '@mui/material/Switch';
-import Divider from '@mui/material/Divider';
-import Grid from '@mui/material/Unstable_Grid2';
-import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
-import InputAdornment from '@mui/material/InputAdornment';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import MenuItem from '@mui/material/MenuItem';
-import Checkbox from '@mui/material/Checkbox';
-import TextField from '@mui/material/TextField';
-import InputLabel from '@mui/material/InputLabel';
-import IconButton from '@mui/material/IconButton';
-import FormControl from '@mui/material/FormControl';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-// routes
+
 import { paths } from 'src/routes/paths';
 // hooks
 import { useResponsive } from 'src/hooks/use-responsive';
@@ -45,7 +31,8 @@ import FormProvider, {
   RHFRadioGroup,
 } from 'src/components/hook-form';
 // types
-import { TaskBugfix } from 'src/types/task';
+import { TaskBugfix, TaskBugfixData } from 'src/types/task';
+import { createIssue } from 'src/api/createTask';
 
 // ----------------------------------------------------------------------
 
@@ -121,10 +108,17 @@ export default function BugfixTaskNewEditForm({ currentTask }: Props) {
   const onSubmit = handleSubmit(async (data) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));
-      reset();
+      const { description, priority } = convertDataToMarkdownFormat(data);
+      console.log('description', description);
+      console.log('priority', priority);
+      createIssue({
+        title: 'Issue for Bug fix',
+        description: description,
+        priority: priority,
+      });
+      // reset();
       enqueueSnackbar('Create success!');
       // router.push(paths.dashboard.task.root);
-      console.info('DATA', data);
     } catch (error) {
       console.error(error);
     }
@@ -282,4 +276,30 @@ export default function BugfixTaskNewEditForm({ currentTask }: Props) {
       </Stack>
     </FormProvider>
   );
+}
+
+// ----------------------------------------------------------------------
+function convertDataToMarkdownFormat(formData: TaskBugfixData) {
+  const description = `
+  * **Reported by:** ${formData?.reportBy}
+  * **Date reported:** ${formData?.dateReported}
+  * **Application/Module:** ${formData?.module}
+  * **Description:** ${formData?.description?.replace(/<[^>]*>/g, '')}
+  * **Severity:** ${formData?.severity} ${formData?.severityEffect}
+  * **Pre-conditions:** ${formData?.preCondition?.replace(/<[^>]*>/g, '')}
+  * **Steps to Reproduce:** ${formData?.stepToProduce?.replace(/<[^>]*>/g, '')}
+  * **Expected Result:** ${formData?.expectedResult?.replace(/<[^>]*>/g, '')}
+  * **Actual Result:** ${formData?.actualResult?.replace(/<[^>]*>/g, '')}
+  * **Additional Information:** ${formData?.additionalInformation?.replace(/<[^>]*>/g, '')}
+  `;
+
+  const priority =
+    formData.priority === 'Urgent'
+      ? 1
+      : formData.priority === 'High'
+      ? 2
+      : formData.priority === 'Medium'
+      ? 3
+      : 4;
+  return { description, priority };
 }

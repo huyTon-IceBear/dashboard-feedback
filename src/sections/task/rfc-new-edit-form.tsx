@@ -25,7 +25,8 @@ import FormProvider, {
   RHFRadioGroup,
 } from 'src/components/hook-form';
 // types
-import { TaskRFC } from 'src/types/task';
+import { TaskRFC, TaskRFCData } from 'src/types/task';
+import { createIssue } from 'src/api/createTask';
 
 // ----------------------------------------------------------------------
 
@@ -41,7 +42,7 @@ export default function RFCTaskNewEditForm({ currentTask }: Props) {
   const NewTaskSchema = Yup.object().shape({
     priority: Yup.string().required('Priority is required'),
     priorityRequirement: Yup.string().required('Priority requirement is required'),
-    isBigClient: Yup.boolean().required('Field is required'),
+    isBigClient: Yup.string().required('Field is required'),
     clientEnvironment: Yup.string().required('Client environment name is required'),
     useCaseImpact: Yup.string().required('Field is required'),
     description: Yup.string().required('Description is required'),
@@ -58,7 +59,7 @@ export default function RFCTaskNewEditForm({ currentTask }: Props) {
     () => ({
       priority: currentTask?.priority || TASK_PRIORITIES[0].value,
       priorityRequirement: currentTask?.priorityRequirement || TASK_PRIORITIES[0].options[0].value,
-      isBigClient: currentTask?.isBigClient || false,
+      isBigClient: currentTask?.isBigClient || '',
       clientEnvironment: currentTask?.clientEnvironment || '',
       useCaseImpact: currentTask?.useCaseImpact || TASK_USE_CASE_IMPACT_OPTIONS[0].value,
       description: currentTask?.description || '',
@@ -97,10 +98,15 @@ export default function RFCTaskNewEditForm({ currentTask }: Props) {
   const onSubmit = handleSubmit(async (data) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));
+      const { description, priority } = convertDataToMarkdownFormat(data);
+      createIssue({
+        title: 'Issue for RFC',
+        description: description,
+        priority: priority,
+      });
       reset();
       enqueueSnackbar('Create success!');
       // router.push(paths.dashboard.task.root);
-      console.info('DATA', data);
     } catch (error) {
       console.error(error);
     }
@@ -139,7 +145,13 @@ export default function RFCTaskNewEditForm({ currentTask }: Props) {
               </MenuItem>
             ))}
           </RHFSelect>
-          <Typography variant="subtitle2">required for: </Typography>
+          <Typography variant="subtitle2">{`${
+            values.priority === TASK_PRIORITIES[0].value
+              ? ',required for: '
+              : values.priority === TASK_PRIORITIES[1].value
+              ? ',need to have but:'
+              : ',nice to have:'
+          }`}</Typography>
           <RHFRadioGroup
             name="priorityRequirement"
             spacing={2}
@@ -258,4 +270,35 @@ export default function RFCTaskNewEditForm({ currentTask }: Props) {
       </Stack>
     </FormProvider>
   );
+}
+
+// ----------------------------------------------------------------------
+function convertDataToMarkdownFormat(formData: TaskRFCData) {
+  const description = `
+  * **Task Details**
+    * Priority as set for consultancy*: ${formData?.priority}, ${formData?.priorityRequirement}
+    * Is this for a big client?* ${formData?.isBigClient}
+    * Name client environment *: ${formData?.clientEnvironment}
+    * Use case impacts *: ${formData?.useCaseImpact}
+    * Description & notes *: ${formData?.description?.replace(/<[^>]*>/g, '')}
+    * How should it work? (Scenario: step by step description of a use case in which this feature / bug is used) *: ${formData?.workDescription?.replace(
+      /<[^>]*>/g,
+      ''
+    )}
+  * **Client Details**
+    * Name & function client: ${formData?.clientName}
+    * This relates to the following usertype / role (think of sales, administration etc): ${formData?.clientRole}
+    * Why should it be added? (what does it solve and what is the added value for Opus users?): ${formData?.reason?.replace(
+      /<[^>]*>/g,
+      ''
+    )}
+    * What is the goal of the client for this feature: ${formData?.goal?.replace(/<[^>]*>/g, '')}
+    * Requirements set by the client and the consultant for this feature (these features will decide whether the feature is delivered or not): ${formData?.requirement?.replace(
+      /<[^>]*>/g,
+      ''
+    )}
+  `;
+
+  const priority = formData.priority === 'High' ? 2 : formData.priority === 'Medium' ? 3 : 4;
+  return { description, priority };
 }

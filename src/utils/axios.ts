@@ -29,6 +29,7 @@ export const endpoints = {
   chat: '/api/chat',
   kanban: '/api/kanban',
   calendar: '/api/calendar',
+  task: 'api/task',
   auth: {
     me: '/api/auth/me',
     login: '/api/auth/login',

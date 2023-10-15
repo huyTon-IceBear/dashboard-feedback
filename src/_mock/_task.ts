@@ -1,7 +1,7 @@
 
 export const TASK_CLIENT_OPTIONS = [
-  { value: true, label: 'Yes' },
-  { value: false, label: 'No' },
+  { value: 'yes', label: 'Yes' },
+  { value: 'no', label: 'No' },
 ];
 
 
