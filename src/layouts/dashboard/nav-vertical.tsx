@@ -63,7 +63,7 @@ export default function NavVertical({ openNav, onCloseNav }: Props) {
 
       <Box sx={{ flexGrow: 1 }} />
 
-      <NavUpgrade />
+      {/* <NavUpgrade /> */}
     </Scrollbar>
   );
 
