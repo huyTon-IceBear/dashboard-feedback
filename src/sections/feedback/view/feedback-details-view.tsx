@@ -25,7 +25,11 @@ export default function FeedbackDetailsView({ id }: Props) {
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
-      <FeedbackToolbar backLink={paths.dashboard.task.root} feedbackIssue={currentFeedback.issue} />
+      <FeedbackToolbar
+        backLink={paths.dashboard.task.root}
+        feedbackIssue={currentFeedback.issue}
+        feedbackId={currentFeedback.id}
+      />
       <FeedbackDetails feedback={currentFeedback} />
     </Container>
   );

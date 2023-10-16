@@ -28,15 +28,26 @@ import { FEEDBACK_ISSUE_OPTIONS } from 'src/_mock';
 type Props = StackProps & {
   backLink: string;
   feedbackIssue: string;
+  feedbackId: string;
 };
 
-export default function FeedbackToolbar({ backLink, feedbackIssue, sx, ...other }: Props) {
+export default function FeedbackToolbar({
+  backLink,
+  feedbackIssue,
+  feedbackId,
+  sx,
+  ...other
+}: Props) {
   const router = useRouter();
 
   const view = useBoolean();
 
   const handleCreateTask = useCallback(() => {
-    router.push(paths.dashboard.task.new.bugfix);
+    const createTaskPath =
+      feedbackIssue === FEEDBACK_ISSUE_OPTIONS[0].value
+        ? paths.dashboard.task.new.rfc
+        : paths.dashboard.task.new.bugfix;
+    router.push(`${createTaskPath}?feedbackId=${feedbackId}`);
   }, [router]);
 
   return (
@@ -61,14 +72,9 @@ export default function FeedbackToolbar({ backLink, feedbackIssue, sx, ...other 
         <Box sx={{ flexGrow: 1 }} />
 
         <Button
-          component={RouterLink}
-          href={
-            feedbackIssue === FEEDBACK_ISSUE_OPTIONS[0].value
-              ? paths.dashboard.task.new.rfc
-              : paths.dashboard.task.new.bugfix
-          }
           variant="contained"
           startIcon={<Iconify icon="mingcute:add-line" />}
+          onClick={handleCreateTask}
         >
           Create Linear Task
         </Button>

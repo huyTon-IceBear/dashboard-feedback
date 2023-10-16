@@ -38,9 +38,11 @@ import { createIssue } from 'src/api/createTask';
 
 type Props = {
   currentTask?: TaskBugfix;
+  feedbackId?: string | null;
 };
 
-export default function BugfixTaskNewEditForm({ currentTask }: Props) {
+export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props) {
+  console.log(feedbackId);
   const router = useRouter();
 
   const mdUp = useResponsive('up', 'md');

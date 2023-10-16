@@ -4,6 +4,7 @@
 import Container from '@mui/material/Container';
 // routes
 import { paths } from 'src/routes/paths';
+import { useSearchParams } from 'src/routes/hooks';
 // components
 import { useSettingsContext } from 'src/components/settings';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
@@ -14,6 +15,11 @@ import BugfixTaskNewEditForm from '../bugfix-new-edit-form';
 
 export default function BugfixTemplateCreateView() {
   const settings = useSettingsContext();
+
+  const searchParams = useSearchParams();
+
+  // Access the query parameters
+  const feedbackId = searchParams.get('feedbackId');
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
@@ -35,7 +41,7 @@ export default function BugfixTemplateCreateView() {
         }}
       />
 
-      <BugfixTaskNewEditForm />
+      <BugfixTaskNewEditForm feedbackId={feedbackId} />
     </Container>
   );
 }

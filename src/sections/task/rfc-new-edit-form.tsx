@@ -32,9 +32,10 @@ import { createIssue } from 'src/api/createTask';
 
 type Props = {
   currentTask?: TaskRFC;
+  feedbackId?: string | null;
 };
 
-export default function RFCTaskNewEditForm({ currentTask }: Props) {
+export default function RFCTaskNewEditForm({ currentTask, feedbackId }: Props) {
   const router = useRouter();
 
   const { enqueueSnackbar } = useSnackbar();
