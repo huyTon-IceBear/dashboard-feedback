@@ -9,14 +9,11 @@ import { IPostItem } from 'src/types/blog';
 import { LinearClient, LinearFetch, User } from "@linear/sdk";
 import { TaskLinear } from 'src/types/task';
 
+import { LINEAR_API_TEST } from 'src/config-global';
+
 // Api key authentication
 const client1 = new LinearClient({
-  apiKey: "lin_api_vp1vEUkGKpm77ocWC2HmmHcrrAJ3kE4ReuXNbAAG"
-})
-
-// OAuth2 authentication
-const client2 = new LinearClient({
-  accessToken: "lin_api_yPPm7vATpvSOxPnj5Q3ObqIS6KMa4l6VAA3rNPFf"
+  apiKey: LINEAR_API_TEST
 })
 
 // ----------------------------------------------------------------------
