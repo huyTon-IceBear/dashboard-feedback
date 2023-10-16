@@ -161,7 +161,7 @@ export default function FeedbackListView() {
 
   const handleViewRow = useCallback(
     (id: string) => {
-      router.push(paths.dashboard.invoice.details(id));
+      router.push(paths.dashboard.feedback.details(id));
     },
     [router]
   );
