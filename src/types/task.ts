@@ -17,7 +17,7 @@ export type TaskRFC = {
 export type TaskBugfix = {
   id: string;
   reportBy: string;
-  dateReported: string;
+  dateReported: Date;
   module: string;
   description: string;
   severity: string;
@@ -33,7 +33,7 @@ export type TaskBugfix = {
 
 export type TaskBugfixData ={
   reportBy?: string;
-  dateReported?: string;
+  dateReported?: Date;
   module?: string;
   description?: string;
   severity?: string;

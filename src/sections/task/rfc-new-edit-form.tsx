@@ -14,7 +14,12 @@ import MenuItem from '@mui/material/MenuItem';
 // routes
 import { paths } from 'src/routes/paths';
 // _mock
-import { TASK_CLIENT_OPTIONS, TASK_USE_CASE_IMPACT_OPTIONS, TASK_PRIORITIES } from 'src/_mock';
+import {
+  TASK_CLIENT_OPTIONS,
+  TASK_USE_CASE_IMPACT_OPTIONS,
+  TASK_PRIORITIES,
+  _feedbacks,
+} from 'src/_mock';
 // components
 import { useSnackbar } from 'src/components/snackbar';
 import { useRouter } from 'src/routes/hooks';
@@ -40,6 +45,8 @@ export default function RFCTaskNewEditForm({ currentTask, feedbackId }: Props) {
 
   const { enqueueSnackbar } = useSnackbar();
 
+  const currentFeedback = _feedbacks.filter((feedback) => feedback.id === feedbackId)[0];
+
   const NewTaskSchema = Yup.object().shape({
     priority: Yup.string().required('Priority is required'),
     priorityRequirement: Yup.string().required('Priority requirement is required'),
@@ -63,11 +70,11 @@ export default function RFCTaskNewEditForm({ currentTask, feedbackId }: Props) {
       isBigClient: currentTask?.isBigClient || '',
       clientEnvironment: currentTask?.clientEnvironment || '',
       useCaseImpact: currentTask?.useCaseImpact || TASK_USE_CASE_IMPACT_OPTIONS[0].value,
-      description: currentTask?.description || '',
+      description: currentFeedback?.description || currentTask?.description || '',
       workDescription: currentTask?.workDescription || '',
       requirement: currentTask?.requirement || '',
       //
-      clientName: currentTask?.clientName || '',
+      clientName: currentFeedback?.creator || currentTask?.clientName || '',
       clientRole: currentTask?.clientRole || '',
       reason: currentTask?.reason || '',
       goal: currentTask?.goal || '',

@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import { useCallback, useMemo, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -9,7 +9,7 @@ import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import MenuItem from '@mui/material/MenuItem';
-
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { paths } from 'src/routes/paths';
 // hooks
 import { useResponsive } from 'src/hooks/use-responsive';
@@ -19,6 +19,7 @@ import {
   TASK_MODULES_OPTIONS,
   TASK_PRIORITY_OPTIONS,
   TASK_SEVERITY_OPTIONS,
+  _feedbacks,
 } from 'src/_mock';
 // components
 import { useSnackbar } from 'src/components/snackbar';
@@ -42,7 +43,8 @@ type Props = {
 };
 
 export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props) {
-  console.log(feedbackId);
+  const currentFeedback = _feedbacks.filter((feedback) => feedback.id === feedbackId)[0];
+
   const router = useRouter();
 
   const mdUp = useResponsive('up', 'md');
@@ -51,7 +53,7 @@ export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props
 
   const NewTaskSchema = Yup.object().shape({
     reportBy: Yup.string().required('Field is required'),
-    dateReported: Yup.string().required('Field is required'),
+    dateReported: Yup.mixed<any>().nullable().required('Date reported is required'),
     module: Yup.string().required('Field is required'),
     severity: Yup.string().required('Field is required'),
     severityEffect: Yup.string().required('Field is required'),
@@ -68,8 +70,8 @@ export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props
 
   const defaultValues = useMemo(
     () => ({
-      reportBy: currentTask?.reportBy || '',
-      dateReported: currentTask?.dateReported || '',
+      reportBy: currentFeedback?.creator || currentTask?.reportBy || '',
+      dateReported: currentFeedback?.createDate || currentTask?.dateReported || '',
       module: currentTask?.module || TASK_MODULES_OPTIONS[0].value,
       severity: currentTask?.severity || TASK_SEVERITY_OPTIONS[0].value,
       severityEffect: currentTask?.severityEffect || TASK_SEVERITY_EFFECT_OPTIONS[0].value,
@@ -79,7 +81,7 @@ export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props
       actualResult: currentTask?.actualResult || '',
       medias: currentTask?.medias || [],
       //
-      description: currentTask?.description || '',
+      description: currentFeedback?.description || currentTask?.description || '',
       preCondition: currentTask?.preCondition || '',
       additionalInformation: currentTask?.additionalInformation || '',
     }),
@@ -93,6 +95,7 @@ export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props
 
   const {
     reset,
+    control,
     watch,
     setValue,
     handleSubmit,
@@ -174,7 +177,23 @@ export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props
         </Stack>
         <Stack alignItems="baseline" sx={{ mb: 1 }}>
           <Typography variant="subtitle2">Date reported</Typography>
-          <RHFTextField name="dateReported" placeholder="Type something..." />
+          <Controller
+            name="dateReported"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <DatePicker
+                {...field}
+                format="dd/MM/yyyy"
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    error: !!error,
+                    helperText: error?.message,
+                  },
+                }}
+              />
+            )}
+          />
         </Stack>
       </Box>
       <Stack sx={{ p: 3 }} spacing={1}>
