@@ -17,8 +17,12 @@
     "re-build-test": "rm -rf node_modules .next out dist build && npm install && npm run build"
   },
   "dependencies": {
+    "@apollo/client": "^3.8.6",
     "@auth0/auth0-react": "^2.2.1",
     "@aws-amplify/auth": "^5.6.4",
+    "@aws-sdk/client-s3": "^3.435.0",
+    "@aws-sdk/s3-request-presigner": "^3.435.0",
+    "@aws-sdk/types": "^3.433.0",
     "@emotion/cache": "^11.10.5",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",

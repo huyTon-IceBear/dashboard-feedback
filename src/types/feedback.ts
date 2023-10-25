@@ -18,7 +18,20 @@ export type Feedback = {
   type: string;
   element: string;
   description: string;
-  creator: string;
-  createDate: Date;
   issue: string;
+  imageUrl: string;
+  videosUrl: string[];
+  created_by: string;
+  created_at: Date;
 };
+
+export type FeedbackDatagrids = {
+  id: string;
+  type: string;
+  element: string;
+  description: string;
+  issue: string;
+  created_by: string;
+  created_at: Date;
+};
+

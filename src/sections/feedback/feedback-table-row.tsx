@@ -16,7 +16,11 @@ import { useBoolean } from 'src/hooks/use-boolean';
 // utils
 import { fCurrency } from 'src/utils/format-number';
 // types
-import { Feedback, FeedbackTableFilters, FeedbackTableFilterValue } from 'src/types/feedback';
+import {
+  FeedbackDatagrids,
+  FeedbackTableFilters,
+  FeedbackTableFilterValue,
+} from 'src/types/feedback';
 // components
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
@@ -27,7 +31,7 @@ import TextMaxLine from 'src/components/text-max-line';
 // ----------------------------------------------------------------------
 
 type Props = {
-  row: Feedback;
+  row: FeedbackDatagrids;
   selected: boolean;
   onSelectRow: VoidFunction;
   onViewRow: VoidFunction;
@@ -41,7 +45,7 @@ export default function FeedbackTableRow({
   onViewRow,
   onDeleteRow,
 }: Props) {
-  const { id, type, element, description, creator, createDate, issue } = row;
+  const { type, description, created_at, created_by } = row;
 
   const confirm = useBoolean();
 
@@ -52,6 +56,16 @@ export default function FeedbackTableRow({
       <TableRow hover selected={selected}>
         <TableCell padding="checkbox">
           <Checkbox checked={selected} onClick={onSelectRow} />
+        </TableCell>
+
+        <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
+          <Avatar alt={created_by} sx={{ mr: 2 }}>
+            {created_by.charAt(0).toUpperCase()}
+          </Avatar>
+
+          <Typography variant="body2" noWrap>
+            {created_by}
+          </Typography>
         </TableCell>
 
         <TableCell>
@@ -66,23 +80,9 @@ export default function FeedbackTableRow({
         </TableCell>
 
         <TableCell>
-          <Label variant="soft">{element}</Label>
-        </TableCell>
-
-        <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-          <Avatar alt={creator} sx={{ mr: 2 }}>
-            {creator.charAt(0).toUpperCase()}
-          </Avatar>
-
-          <Typography variant="body2" noWrap>
-            {creator}
-          </Typography>
-        </TableCell>
-
-        <TableCell>
           <ListItemText
-            primary={format(new Date(createDate), 'dd MMM yyyy')}
-            secondary={format(new Date(createDate), 'p')}
+            primary={format(new Date(created_at), 'dd MMM yyyy')}
+            secondary={format(new Date(created_at), 'p')}
             primaryTypographyProps={{ typography: 'body2', noWrap: true }}
             secondaryTypographyProps={{
               mt: 0.5,
@@ -96,10 +96,6 @@ export default function FeedbackTableRow({
           <TextMaxLine variant={'body2'} line={1} persistent>
             {description}
           </TextMaxLine>
-        </TableCell>
-
-        <TableCell>
-          <Label variant="soft">{issue}</Label>
         </TableCell>
 
         <TableCell align="right" sx={{ px: 1 }}>

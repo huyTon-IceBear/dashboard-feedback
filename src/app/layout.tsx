@@ -40,6 +40,7 @@ import { SettingsProvider, SettingsDrawer } from 'src/components/settings';
 import { CheckoutProvider } from 'src/sections/checkout/context';
 // auth
 import { AuthProvider, AuthConsumer } from 'src/auth/context/jwt';
+import AppApolloProvider from './context/ApolloProvider';
 // import { AuthProvider, AuthConsumer } from 'src/auth/context/auth0';
 // import { AuthProvider, AuthConsumer } from 'src/auth/context/amplify';
 // import { AuthProvider, AuthConsumer } from 'src/auth/context/firebase';
@@ -108,7 +109,9 @@ export default function RootLayout({ children }: Props) {
                     <CheckoutProvider>
                       <SettingsDrawer />
                       <ProgressBar />
-                      <AuthConsumer>{children}</AuthConsumer>
+                      <AuthConsumer>
+                        <AppApolloProvider>{children}</AppApolloProvider>
+                      </AuthConsumer>
                     </CheckoutProvider>
                   </SnackbarProvider>
                 </MotionLazy>

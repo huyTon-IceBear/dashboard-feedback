@@ -1,7 +1,6 @@
 'use client';
-
-import sumBy from 'lodash/sumBy';
 import { useState, useCallback } from 'react';
+import { gql, useQuery } from '@apollo/client';
 // @mui
 import { useTheme, alpha } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
@@ -44,7 +43,11 @@ import {
   TablePaginationCustom,
 } from 'src/components/table';
 // types
-import { Feedback, FeedbackTableFilters, FeedbackTableFilterValue } from 'src/types/feedback';
+import {
+  FeedbackDatagrids,
+  FeedbackTableFilters,
+  FeedbackTableFilterValue,
+} from 'src/types/feedback';
 //
 import FeedbackTableRow from '../feedback-table-row';
 import FeedbackTableToolbar from '../feedback-table-toolbar';
@@ -53,12 +56,10 @@ import FeedbackTableFiltersResult from '../feedback-table-filters-result';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
+  { id: 'createBy', label: 'Customer' },
   { id: 'type', label: 'Type' },
-  { id: 'element', label: 'Element' },
-  { id: 'creator', label: 'User' },
-  { id: 'createDate', label: 'Create' },
+  { id: 'createAt', label: 'Create at' },
   { id: 'description', label: 'Description' },
-  { id: 'issue', label: 'Issue' },
   { id: '' },
 ];
 
@@ -72,6 +73,22 @@ const defaultFilters: FeedbackTableFilters = {
 
 // ----------------------------------------------------------------------
 
+const GET_FEEDBACKS = gql`
+  query GET_FEEDBACKS {
+    feedback {
+      id
+      imageUrl
+      videosUrl
+      description
+      element
+      issue
+      type
+      created_at
+      created_by
+    }
+  }
+`;
+
 export default function FeedbackListView() {
   const theme = useTheme();
 
@@ -83,9 +100,16 @@ export default function FeedbackListView() {
 
   const confirm = useBoolean();
 
-  const [tableData, setTableData] = useState(_feedbacks);
+  const [tableData, setTableData] = useState<FeedbackDatagrids[]>([]);
 
   const [filters, setFilters] = useState(defaultFilters);
+
+  const { loading } = useQuery(GET_FEEDBACKS, {
+    onCompleted: (data) => {
+      console.log('data', data);
+      setTableData(data.feedback);
+    },
+  });
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -109,7 +133,8 @@ export default function FeedbackListView() {
 
   const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
 
-  const getFeedbackLength = (type: string) => tableData.filter((item) => item.type === type).length;
+  const getFeedbackLength = (type: string) =>
+    tableData?.filter((item) => item.type === type).length;
 
   const TABS = [
     { value: 'all', label: 'All', color: 'default', count: tableData.length },
@@ -275,14 +300,11 @@ export default function FeedbackListView() {
                   order={table.order}
                   orderBy={table.orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={tableData.length}
+                  rowCount={tableData?.length ?? 0}
                   numSelected={table.selected.length}
                   onSort={table.onSort}
                   onSelectAllRows={(checked) =>
-                    table.onSelectAllRows(
-                      checked,
-                      tableData.map((row) => row.id)
-                    )
+                    table.onSelectAllRows(checked, tableData?.map((row) => row.id))
                   }
                 />
 
@@ -360,7 +382,7 @@ function applyFilter({
   comparator,
   filters,
 }: {
-  inputData: Feedback[];
+  inputData: FeedbackDatagrids[];
   comparator: (a: any, b: any) => number;
   filters: FeedbackTableFilters;
 }) {
@@ -379,7 +401,7 @@ function applyFilter({
   if (name) {
     inputData = inputData.filter(
       (feedback) =>
-        feedback.creator.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
+        feedback.created_by.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
         feedback.description.toLowerCase().indexOf(name.toLowerCase()) !== -1
     );
   }
@@ -398,7 +420,7 @@ function applyFilter({
 
   if (startDate) {
     inputData = inputData.filter(
-      (feedback) => fTimestamp(feedback.createDate) >= fTimestamp(startDate)
+      (feedback) => fTimestamp(feedback.created_at) >= fTimestamp(startDate)
     );
   }
 

@@ -28,7 +28,7 @@ type Props = {
 };
 
 export default function FeedbackDetails({ feedback }: Props) {
-  const { type, element, description, creator, createDate, issue } = feedback;
+  const { type, element, description, created_at, created_by, issue } = feedback;
 
   const renderContent = (
     <Stack component={Card} spacing={3} sx={{ p: 3 }}>
@@ -69,12 +69,12 @@ export default function FeedbackDetails({ feedback }: Props) {
       {[
         {
           label: 'User',
-          value: creator,
+          value: created_by,
           icon: <Iconify icon="solar:user-circle-bold" />,
         },
         {
           label: 'Created date',
-          value: fDate(createDate),
+          value: fDate(created_at),
           icon: <Iconify icon="solar:calendar-date-bold" />,
         },
       ].map((item) => (
