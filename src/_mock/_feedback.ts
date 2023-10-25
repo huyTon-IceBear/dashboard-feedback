@@ -27,7 +27,7 @@ export const _feedbacks = [...Array(20)].map((_, index) => {
     id: _mock.id(index),
     type,
     element,
-    description: _mock.sentence(index),
+    description: _mock.feedback( index % 2),
     creator: _mock.fullName(index),
     createDate: subDays(new Date(), index),
     issue,

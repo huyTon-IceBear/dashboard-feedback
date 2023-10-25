@@ -525,3 +525,9 @@ export const _descriptions = [
   `Ipsam aliquam velit nobis repellendus officiis aut deserunt id et. Nihil sunt aut dolores aut. Dolores est ipsa quia et laborum quidem laborum accusamus id. Facilis odit quod hic laudantium saepe omnis nisi in sint. Sed cupiditate possimus id.`,
   `Magnam non eveniet optio optio ut aliquid atque. Velit libero aspernatur quis laborum consequatur laudantium. Tempora facere optio fugit accusantium ut. Omnis aspernatur reprehenderit autem esse ut ut enim voluptatibus.`,
 ];
+
+//
+export const _feedbackSamples=[
+  `The user interface (UI) and user experience (UX) design of our ERP system offer an incredibly intuitive and efficient platform. Navigating through the system feels as effortless as a leisurely stroll, with features and functions logically organized and easily accessible. The modern and clean aesthetics of the UI not only enhance visual appeal but also reduce cognitive load. Users find it as user-friendly as a well-designed product can be, which has led to quicker adoption and improved productivity. Our ERP system's UI/UX truly simplifies daily tasks, making even complex processes as straightforward as a walk in the park, resulting in a seamless and satisfying user experience.`,
+  `The ERP system's user interface (UI) and user experience (UX) design is like a breath of fresh air in our daily operations. Navigating through the system is as smooth as a well-paved path through a beautiful park, offering a hassle-free experience. The modern and clean design not only pleases the eye but also enhances usability, reducing the learning curve for new users. Our team finds the UI/UX to be as user-friendly as a trusted tool in their hands, streamlining complex processes and tasks, and improving overall efficiency. In summary, the ERP system's UI/UX features have transformed our workflow into a delightful and intuitive journey, making even intricate tasks feel as easy as a leisurely stroll.`
+]

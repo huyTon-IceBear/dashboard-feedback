@@ -22,6 +22,7 @@ import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
+import TextMaxLine from 'src/components/text-max-line';
 
 // ----------------------------------------------------------------------
 
@@ -91,7 +92,11 @@ export default function FeedbackTableRow({
           />
         </TableCell>
 
-        <TableCell>{description}</TableCell>
+        <TableCell>
+          <TextMaxLine variant={'body2'} line={1} persistent>
+            {description}
+          </TextMaxLine>
+        </TableCell>
 
         <TableCell>
           <Label variant="soft">{issue}</Label>
