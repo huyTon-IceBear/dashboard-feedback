@@ -77,8 +77,6 @@ const GET_FEEDBACKS = gql`
   query GET_FEEDBACKS {
     feedback {
       id
-      imageUrl
-      videosUrl
       description
       element
       issue
@@ -106,7 +104,6 @@ export default function FeedbackListView() {
 
   const { loading } = useQuery(GET_FEEDBACKS, {
     onCompleted: (data) => {
-      console.log('data', data);
       setTableData(data.feedback);
     },
   });

@@ -21,7 +21,6 @@ const client1 = new LinearClient({
 export async function createIssue(TaskData: TaskLinear) {
   const me = await client1.viewer;
   const teams = await client1.teams();
-  console.log(TaskData)
   if (teams.nodes[0].id) {
     await client1.createIssue(
       {

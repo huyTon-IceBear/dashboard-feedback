@@ -123,7 +123,6 @@ export default function FeedbackTableRow({
 
         <MenuItem
           onClick={() => {
-            console.log('create task');
             popover.onClose();
           }}
         >

@@ -1,5 +1,5 @@
 'use client';
-
+import { gql, useQuery } from '@apollo/client';
 // @mui
 import Container from '@mui/material/Container';
 // routes
@@ -18,19 +18,45 @@ type Props = {
   id: string;
 };
 
+const GET_A_FEEDBACK = gql`
+  query GET_A_FEEDBACK($id: uuid!) {
+    feedback_by_pk(id: $id) {
+      id
+      description
+      element
+      issue
+      type
+      imageUrl
+      videosUrl
+      created_at
+      created_by
+    }
+  }
+`;
+
 export default function FeedbackDetailsView({ id }: Props) {
   const settings = useSettingsContext();
 
-  const currentFeedback = _feedbacks.filter((feedback) => feedback.id === id)[0];
+  const { loading, data } = useQuery(GET_A_FEEDBACK, {
+    variables: {
+      id,
+    },
+  });
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
-      <FeedbackToolbar
-        backLink={paths.dashboard.task.root}
-        feedbackIssue={currentFeedback.issue}
-        feedbackId={currentFeedback.id}
-      />
-      <FeedbackDetails feedback={currentFeedback} />
+      {loading ? (
+        <></>
+      ) : (
+        <>
+          <FeedbackToolbar
+            backLink={paths.dashboard.task.root}
+            feedbackIssue={data?.feedback_by_pk?.issue}
+            feedbackId={data?.feedback_by_pk?.id}
+          />
+          <FeedbackDetails feedback={data?.feedback_by_pk} />
+        </>
+      )}
     </Container>
   );
 }

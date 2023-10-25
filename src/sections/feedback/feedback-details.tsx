@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { Slide, SlideImage } from 'yet-another-react-lightbox';
 // @mui
 import Chip from '@mui/material/Chip';
 import Card from '@mui/material/Card';
@@ -12,14 +13,13 @@ import Label from 'src/components/label';
 import Box from '@mui/material/Box';
 // utils
 import { fDate } from 'src/utils/format-time';
-import { fCurrency } from 'src/utils/format-number';
-// _mock
-import { INVOICE_STATUS_OPTIONS } from 'src/_mock';
 // types
 import { Feedback } from 'src/types/feedback';
 // components
 import Iconify from 'src/components/iconify';
-import Markdown from 'src/components/markdown';
+import Image from 'src/components/image';
+import Lightbox, { useLightBox } from 'src/components/lightbox';
+import { downloadMediaFile } from 'src/api/downloadMedia';
 
 // ----------------------------------------------------------------------
 
@@ -28,7 +28,65 @@ type Props = {
 };
 
 export default function FeedbackDetails({ feedback }: Props) {
-  const { type, element, description, created_at, created_by, issue } = feedback;
+  const { type, element, description, created_at, created_by, issue, imageUrl, videosUrl } =
+    feedback;
+  const [videoSrcs, setVideoSrcs] = useState<string[]>(['']);
+  const [imageSrc, setImageSrc] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  const getPresignedUrl = async (key: string) => {
+    return await downloadMediaFile(`monitoring/medias/${key}`);
+  };
+
+  useEffect(() => {
+    getPresignedUrl(imageUrl).then((response) => {
+      const parsedResponse = JSON.parse(response.body);
+      setImageSrc(parsedResponse.url);
+    });
+
+    Promise.all(videosUrl.map((videoUrl) => getPresignedUrl(videoUrl)))
+      .then((responses) => {
+        const parsedResponses = responses.map((response) => JSON.parse(response.body));
+        setVideoSrcs(parsedResponses.map((parsedResponse) => parsedResponse.url));
+      })
+      .then(() => {
+        setIsLoading(false);
+      });
+  }, [imageUrl, videosUrl]);
+
+  const renderMediaFile = (
+    <Stack spacing={2}>
+      <Typography variant="h6">Evidences</Typography>
+      <Stack>
+        <Typography variant="h6">Images</Typography>
+        <Box sx={{ p: 1 }}>
+          <Image
+            alt={'feedback_screenshot'}
+            src={imageSrc} // use imageSrc here
+            sx={{ borderRadius: 1.5 }}
+          />
+        </Box>
+      </Stack>
+      <Stack>
+        <Typography variant="h6">Videos</Typography>
+        {isLoading ? (
+          <div>Loading...</div>
+        ) : (
+          <>
+            {videoSrcs.map((videoSrc, index) => (
+              <video key={index} controls>
+                <source src={videoSrc} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            ))}
+            {videoSrcs.length === 0 && (
+              <Typography variant="body2">No Screen Recordings</Typography>
+            )}
+          </>
+        )}
+      </Stack>
+    </Stack>
+  );
 
   const renderContent = (
     <Stack component={Card} spacing={3} sx={{ p: 3 }}>
@@ -58,9 +116,7 @@ export default function FeedbackDetails({ feedback }: Props) {
         <Typography variant="h6">Description</Typography>
         <Typography variant="body2">{description}</Typography>
       </Stack>
-      <Stack spacing={2}>
-        <Typography variant="h6">Evidences</Typography>
-      </Stack>
+      {renderMediaFile}
     </Stack>
   );
 
@@ -101,6 +157,13 @@ export default function FeedbackDetails({ feedback }: Props) {
 
   return (
     <Grid container spacing={3}>
+      {/* <Lightbox
+        index={lightbox.selected}
+        slides={slides}
+        open={lightbox.open}
+        close={lightbox.onClose}
+      /> */}
+
       <Grid xs={12} md={8}>
         {renderContent}
       </Grid>
