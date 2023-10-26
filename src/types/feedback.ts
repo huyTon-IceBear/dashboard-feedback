@@ -35,3 +35,8 @@ export type FeedbackDatagrids = {
   created_at: Date;
 };
 
+export type FeedbackRFCType = {
+  description: string;
+  created_by: string;
+};
+

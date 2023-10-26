@@ -40,11 +40,10 @@ export default function FeedbackToolbar({
 }: Props) {
   const router = useRouter();
 
-  const view = useBoolean();
-
+  console.log('feedbackIssue', feedbackIssue);
   const handleCreateTask = useCallback(() => {
     const createTaskPath =
-      feedbackIssue === FEEDBACK_ISSUE_OPTIONS[0].value
+      feedbackIssue.toLocaleLowerCase() === FEEDBACK_ISSUE_OPTIONS[0].value.toLocaleLowerCase()
         ? paths.dashboard.task.new.rfc
         : paths.dashboard.task.new.bugfix;
     router.push(`${createTaskPath}?feedbackId=${feedbackId}`);

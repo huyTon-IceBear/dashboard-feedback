@@ -1,5 +1,5 @@
 'use client';
-
+import { useQuery } from '@apollo/client';
 // @mui
 import Container from '@mui/material/Container';
 // routes
@@ -10,6 +10,7 @@ import { useSettingsContext } from 'src/components/settings';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 //
 import RFCTaskNewEditForm from '../rfc-new-edit-form';
+import { GET_A_FEEDBACK_RFC } from 'src/sections/feedback/feedback-data-request';
 
 // ----------------------------------------------------------------------
 
@@ -21,27 +22,38 @@ export default function RFCTemplateCreateView() {
   // Access the query parameters
   const feedbackId = searchParams.get('feedbackId');
 
+  const { loading, data } = useQuery(GET_A_FEEDBACK_RFC, {
+    variables: {
+      id: feedbackId,
+    },
+  });
+
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
-      <CustomBreadcrumbs
-        heading="RFC template"
-        links={[
-          {
-            name: 'Dashboard',
-            href: paths.dashboard.root,
-          },
-          {
-            name: 'Task',
-            href: paths.dashboard.task.root,
-          },
-          { name: 'New Task' },
-        ]}
-        sx={{
-          mb: { xs: 3, md: 5 },
-        }}
-      />
-
-      <RFCTaskNewEditForm feedbackId={feedbackId} />
+      {loading ? (
+        <></>
+      ) : (
+        <>
+          <CustomBreadcrumbs
+            heading="RFC template"
+            links={[
+              {
+                name: 'Dashboard',
+                href: paths.dashboard.root,
+              },
+              {
+                name: 'Task',
+                href: paths.dashboard.task.root,
+              },
+              { name: 'New Task' },
+            ]}
+            sx={{
+              mb: { xs: 3, md: 5 },
+            }}
+          />
+          <RFCTaskNewEditForm feedback={data?.feedback_by_pk} />
+        </>
+      )}
     </Container>
   );
 }

@@ -32,20 +32,19 @@ import FormProvider, {
 // types
 import { TaskRFC, TaskRFCData } from 'src/types/task';
 import { createIssue } from 'src/api/createTask';
+import { FeedbackRFCType } from 'src/types/feedback';
 
 // ----------------------------------------------------------------------
 
 type Props = {
   currentTask?: TaskRFC;
-  feedbackId?: string | null;
+  feedback?: FeedbackRFCType;
 };
 
-export default function RFCTaskNewEditForm({ currentTask, feedbackId }: Props) {
+export default function RFCTaskNewEditForm({ currentTask, feedback }: Props) {
   const router = useRouter();
 
   const { enqueueSnackbar } = useSnackbar();
-
-  const currentFeedback = _feedbacks.filter((feedback) => feedback.id === feedbackId)[0];
 
   const NewTaskSchema = Yup.object().shape({
     priority: Yup.string().required('Priority is required'),
@@ -70,11 +69,11 @@ export default function RFCTaskNewEditForm({ currentTask, feedbackId }: Props) {
       isBigClient: currentTask?.isBigClient || '',
       clientEnvironment: currentTask?.clientEnvironment || '',
       useCaseImpact: currentTask?.useCaseImpact || TASK_USE_CASE_IMPACT_OPTIONS[0].value,
-      description: currentFeedback?.description || currentTask?.description || '',
+      description: feedback?.description || currentTask?.description || '',
       workDescription: currentTask?.workDescription || '',
       requirement: currentTask?.requirement || '',
       //
-      clientName: currentFeedback?.creator || currentTask?.clientName || '',
+      clientName: feedback?.created_by || currentTask?.clientName || '',
       clientRole: currentTask?.clientRole || '',
       reason: currentTask?.reason || '',
       goal: currentTask?.goal || '',
