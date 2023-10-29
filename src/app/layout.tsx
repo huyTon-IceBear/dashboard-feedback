@@ -36,8 +36,6 @@ import ProgressBar from 'src/components/progress-bar';
 import { MotionLazy } from 'src/components/animate/motion-lazy';
 import SnackbarProvider from 'src/components/snackbar/snackbar-provider';
 import { SettingsProvider, SettingsDrawer } from 'src/components/settings';
-// sections
-import { CheckoutProvider } from 'src/sections/checkout/context';
 // auth
 import { AuthProvider, AuthConsumer } from 'src/auth/context/jwt';
 import AppApolloProvider from './context/ApolloProvider';
@@ -106,13 +104,11 @@ export default function RootLayout({ children }: Props) {
               <ThemeProvider>
                 <MotionLazy>
                   <SnackbarProvider>
-                    <CheckoutProvider>
-                      <SettingsDrawer />
-                      <ProgressBar />
-                      <AuthConsumer>
-                        <AppApolloProvider>{children}</AppApolloProvider>
-                      </AuthConsumer>
-                    </CheckoutProvider>
+                    <SettingsDrawer />
+                    <ProgressBar />
+                    <AuthConsumer>
+                      <AppApolloProvider>{children}</AppApolloProvider>
+                    </AuthConsumer>
                   </SnackbarProvider>
                 </MotionLazy>
               </ThemeProvider>
