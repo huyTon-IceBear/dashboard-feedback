@@ -40,3 +40,10 @@ export type FeedbackRFCType = {
   created_by: string;
 };
 
+export type FeedbackBugFixType = {
+  description: string;
+  imageUrl: string;
+  videosUrl: string[];
+  created_by: string;
+  created_at: Date;
+};

@@ -24,3 +24,16 @@ export const GET_A_FEEDBACK_RFC = gql`
     }
   }
 `;
+
+export const GET_A_FEEDBACK_BUGFIX = gql`
+  query GET_A_FEEDBACK($id: uuid!) {
+    feedback_by_pk(id: $id) {
+      id
+      description
+      imageUrl
+      videosUrl
+      created_at
+      created_by
+    }
+  }
+`;

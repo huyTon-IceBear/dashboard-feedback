@@ -31,23 +31,23 @@ import FormProvider, {
   RHFTextField,
   RHFRadioGroup,
 } from 'src/components/hook-form';
+import Image from 'src/components/image';
 // types
 import { TaskBugfix, TaskBugfixData } from 'src/types/task';
 import { createIssue } from 'src/api/createTask';
+import { FeedbackBugFixType } from 'src/types/feedback';
+import { downloadMediaFile } from 'src/api/downloadMedia';
+import { uploadFileToLinear } from 'src/api/uploadLinear';
 
 // ----------------------------------------------------------------------
 
 type Props = {
   currentTask?: TaskBugfix;
-  feedbackId?: string | null;
+  feedback?: FeedbackBugFixType;
 };
 
-export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props) {
-  const currentFeedback = _feedbacks.filter((feedback) => feedback.id === feedbackId)[0];
-
+export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) {
   const router = useRouter();
-
-  const mdUp = useResponsive('up', 'md');
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -61,7 +61,6 @@ export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props
     stepToProduce: Yup.string().required('Field is required'),
     expectedResult: Yup.string().required('Field is required'),
     actualResult: Yup.string().required('Field is required'),
-    medias: Yup.array().min(1, 'medias is required'),
     // not required
     description: Yup.string(),
     preCondition: Yup.string(),
@@ -70,8 +69,8 @@ export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props
 
   const defaultValues = useMemo(
     () => ({
-      reportBy: currentFeedback?.creator || currentTask?.reportBy || '',
-      dateReported: currentFeedback?.createDate || currentTask?.dateReported || '',
+      reportBy: feedback?.created_by || currentTask?.reportBy || '',
+      dateReported: feedback?.created_at || currentTask?.dateReported || '',
       module: currentTask?.module || TASK_MODULES_OPTIONS[0].value,
       severity: currentTask?.severity || TASK_SEVERITY_OPTIONS[0].value,
       severityEffect: currentTask?.severityEffect || TASK_SEVERITY_EFFECT_OPTIONS[0].value,
@@ -79,9 +78,8 @@ export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props
       stepToProduce: currentTask?.stepToProduce || '',
       expectedResult: currentTask?.expectedResult || '',
       actualResult: currentTask?.actualResult || '',
-      medias: currentTask?.medias || [],
       //
-      description: currentFeedback?.description || currentTask?.description || '',
+      description: feedback?.description || currentTask?.description || '',
       preCondition: currentTask?.preCondition || '',
       additionalInformation: currentTask?.additionalInformation || '',
     }),
@@ -110,13 +108,65 @@ export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props
     }
   }, [currentTask, defaultValues, reset]);
 
+  const [videoSrcs, setVideoSrcs] = useState<string[]>(['']);
+  const [imageSrc, setImageSrc] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  const getPresignedUrl = async (key: string) => {
+    return await downloadMediaFile(`monitoring/medias/${key}`);
+  };
+
+  useEffect(() => {
+    if (feedback?.imageUrl) {
+      getPresignedUrl(feedback.imageUrl).then((response) => {
+        const parsedResponse = JSON.parse(response.body);
+        setImageSrc(parsedResponse.url);
+      });
+    }
+
+    if (feedback?.videosUrl) {
+      Promise.all(feedback.videosUrl.map((videoUrl) => getPresignedUrl(videoUrl)))
+        .then((responses) => {
+          const parsedResponses = responses.map((response) => JSON.parse(response.body));
+          setVideoSrcs(parsedResponses.map((parsedResponse) => parsedResponse.url));
+        })
+        .then(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [feedback]);
+
+  async function urlToFile(url: string, filename: string): Promise<File> {
+    const response = await fetch(url);
+    const blob = await response.blob();
+
+    return new File([blob], filename, { type: blob.type });
+  }
+
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      const { description, priority } = convertDataToMarkdownFormat(data);
-      console.log('description', description);
-      console.log('priority', priority);
-      createIssue({
+      const imageResponse = await getPresignedUrl(imageSrc);
+      const imageUrl = JSON.parse(imageResponse.body).url;
+
+      const imageFile = await urlToFile(imageUrl, 'image.png');
+      const imageUploadedUrl = await uploadFileToLinear(imageFile);
+
+      const videoUploadedUrl = await Promise.all(
+        videoSrcs.map(async (videoUrl) => {
+          const response = await getPresignedUrl(videoUrl);
+          const url = JSON.parse(response.body).url;
+          const videoFile = await urlToFile(url, 'video.mp4');
+          return uploadFileToLinear(videoFile);
+        })
+      );
+
+      const { description, priority } = convertDataToMarkdownFormat(
+        data,
+        imageUploadedUrl,
+        videoUploadedUrl
+      );
+
+      await createIssue({
         title: 'Issue for Bug fix',
         description: description,
         priority: priority,
@@ -129,32 +179,35 @@ export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props
     }
   });
 
-  const handleDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      const files = values.medias || [];
-
-      const newFiles = acceptedFiles.map((file) =>
-        Object.assign(file, {
-          preview: URL.createObjectURL(file),
-        })
-      );
-
-      setValue('medias', [...files, ...newFiles], { shouldValidate: true });
-    },
-    [setValue, values.medias]
+  const renderMediaFile = (
+    <Stack spacing={2}>
+      <Typography variant="subtitle2">Screenshots/Video*</Typography>
+      <Stack>
+        <Typography variant="h6">Images</Typography>
+        <Box sx={{ p: 1 }}>
+          <Image alt={'feedback_screenshot'} src={imageSrc} sx={{ borderRadius: 1.5 }} />
+        </Box>
+      </Stack>
+      <Stack>
+        <Typography variant="h6">Videos</Typography>
+        {isLoading ? (
+          <div>Loading...</div>
+        ) : (
+          <>
+            {videoSrcs.map((videoSrc, index) => (
+              <video key={index} controls>
+                <source src={videoSrc} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            ))}
+            {videoSrcs.length === 0 && (
+              <Typography variant="body2">No Screen Recordings</Typography>
+            )}
+          </>
+        )}
+      </Stack>
+    </Stack>
   );
-
-  const handleRemoveFile = useCallback(
-    (inputFile: File | string) => {
-      const filtered = values.medias && values.medias?.filter((file) => file !== inputFile);
-      setValue('medias', filtered);
-    },
-    [setValue, values.medias]
-  );
-
-  const handleRemoveAllFiles = useCallback(() => {
-    setValue('medias', []);
-  }, [setValue]);
 
   const renderDetails = (
     <Stack sx={{ width: 1 }}>
@@ -175,7 +228,7 @@ export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props
           <Typography variant="subtitle2">Reported by</Typography>
           <RHFTextField name="reportBy" placeholder="Type something..." />
         </Stack>
-        <Stack alignItems="baseline" sx={{ mb: 1 }}>
+        {/* <Stack alignItems="baseline" sx={{ mb: 1 }}>
           <Typography variant="subtitle2">Date reported</Typography>
           <Controller
             name="dateReported"
@@ -194,7 +247,7 @@ export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props
               />
             )}
           />
-        </Stack>
+        </Stack> */}
       </Box>
       <Stack sx={{ p: 3 }} spacing={1}>
         <Typography variant="subtitle2">Application/Module*</Typography>
@@ -267,18 +320,7 @@ export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props
         </Stack>
       </Box>
       <Stack sx={{ p: 3 }} spacing={1}>
-        <Typography variant="subtitle2">Screenshots/Video*</Typography>
-        <RHFUpload
-          multiple
-          thumbnail
-          name="medias"
-          accept={{}}
-          maxSize={3145728}
-          onDrop={handleDrop}
-          onRemove={handleRemoveFile}
-          onRemoveAll={handleRemoveAllFiles}
-          onUpload={() => console.info('ON UPLOAD')}
-        />
+        {renderMediaFile}
       </Stack>
       <Stack sx={{ p: 3 }} spacing={1}>
         <Typography variant="subtitle2">Additional Information</Typography>
@@ -300,7 +342,15 @@ export default function BugfixTaskNewEditForm({ currentTask, feedbackId }: Props
 }
 
 // ----------------------------------------------------------------------
-function convertDataToMarkdownFormat(formData: TaskBugfixData) {
+function convertDataToMarkdownFormat(
+  formData: TaskBugfixData,
+  imageUrl: string,
+  videosUrl: string[]
+) {
+  const videoLinksMarkdown = videosUrl
+    .map((url, index) => `* **Video ${index + 1}:** [Video Link](${url})`)
+    .join('\n');
+
   const description = `
   * **Reported by:** ${formData?.reportBy}
   * **Date reported:** ${formData?.dateReported}
@@ -311,6 +361,8 @@ function convertDataToMarkdownFormat(formData: TaskBugfixData) {
   * **Steps to Reproduce:** ${formData?.stepToProduce?.replace(/<[^>]*>/g, '')}
   * **Expected Result:** ${formData?.expectedResult?.replace(/<[^>]*>/g, '')}
   * **Actual Result:** ${formData?.actualResult?.replace(/<[^>]*>/g, '')}
+  * **Screenshot:** \n ![Screenshot](${imageUrl})
+  * **Videos:** \n ${videoLinksMarkdown}
   * **Additional Information:** ${formData?.additionalInformation?.replace(/<[^>]*>/g, '')}
   `;
 

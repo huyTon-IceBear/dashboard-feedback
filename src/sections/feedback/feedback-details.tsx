@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Slide, SlideImage } from 'yet-another-react-lightbox';
 // @mui
-import Chip from '@mui/material/Chip';
 import Card from '@mui/material/Card';
 import Paper from '@mui/material/Paper';
 import Stack, { StackProps } from '@mui/material/Stack';
