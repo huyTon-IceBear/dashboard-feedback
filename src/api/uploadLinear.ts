@@ -1,17 +1,42 @@
-// Linear SDK
-import { LinearClient, LinearFetch, User } from "@linear/sdk";
-import { TaskLinear } from 'src/types/task';
-
+import { NextApiRequest, NextApiResponse } from "next";
+import multer from "multer";
+import fetch, { Headers } from "node-fetch";
+import { LinearClient } from "@linear/sdk";
+import { NextFunction } from "express";
+import { IncomingMessage, ServerResponse } from "http";
 import { LINEAR_API_TEST } from 'src/config-global';
 
 // Api key authentication
-const client1 = new LinearClient({
+const linearClient = new LinearClient({
   apiKey: LINEAR_API_TEST
 })
 
-/** Uploads a file to Linear, returning the uploaded URL. @throws */
-export async function uploadFileToLinear(file: File): Promise<string> {
-  const uploadPayload = await client1.fileUpload(file.type, file.name, file.size);
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+const formHandler = upload.single("file");
+
+export default async function (req: NextApiRequest, res: NextApiResponse): Promise<void> {
+  await runMiddleware(req, res, formHandler as any);
+  const multerFile = (req as NextApiRequest & { file: Express.Multer.File }).file;
+
+  try {
+    const url = await uploadFileToLinear(multerFile);
+    res.status(200).json({ url });
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+}
+
+export const config = {
+  api: {
+    // Disable Next.js default body parsing, let multer parse the form data
+    bodyParser: false,
+  },
+};
+
+/** Uploads a file to Linear, returning the uploaded URL. */
+async function uploadFileToLinear(file: Express.Multer.File): Promise<string> {
+  const uploadPayload = await linearClient.fileUpload(file.mimetype, file.originalname, file.size);
 
   if (!uploadPayload.success || !uploadPayload.uploadFile) {
     throw new Error("Failed to request upload URL");
@@ -22,20 +47,39 @@ export async function uploadFileToLinear(file: File): Promise<string> {
 
   // Make sure to copy the response headers for the PUT request
   const headers = new Headers();
-  headers.set("Content-Type", file.type);
+
+  // It is important that the content-type of the request matches the value passed as the first argument to `fileUpload`.
+  headers.set("Content-Type", file.mimetype);
   headers.set("Cache-Control", "public, max-age=31536000");
   uploadPayload.uploadFile.headers.forEach(({ key, value }) => headers.set(key, value));
 
   try {
     await fetch(uploadUrl, {
+      // Note PUT is important here, other verbs will not work.
       method: "PUT",
+      body: file.buffer,
       headers,
-      body: file
     });
 
     return assetUrl;
   } catch (e) {
-    console.error(e);
-    throw new Error("Failed to upload file to Linear");
+    throw new Error("Failed to upload file to Linear", { cause: e });
   }
+}
+
+/** Wrapper for Express.js style middleware in a serverless function */
+function runMiddleware(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  fn: (req: IncomingMessage, res: ServerResponse, next: (result?: unknown) => void) => void | Promise<void>
+) {
+  return new Promise((resolve, reject) => {
+    fn(req as any, res as any, (result: unknown) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+
+      return resolve(result);
+    });
+  });
 }

@@ -37,7 +37,6 @@ import { TaskBugfix, TaskBugfixData } from 'src/types/task';
 import { createIssue } from 'src/api/createTask';
 import { FeedbackBugFixType } from 'src/types/feedback';
 import { downloadMediaFile } from 'src/api/downloadMedia';
-import { uploadFileToLinear } from 'src/api/uploadLinear';
 
 // ----------------------------------------------------------------------
 
@@ -139,38 +138,62 @@ export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) 
   async function urlToFile(url: string, filename: string): Promise<File> {
     const response = await fetch(url);
     const blob = await response.blob();
-
     return new File([blob], filename, { type: blob.type });
   }
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const imageResponse = await getPresignedUrl(imageSrc);
-      const imageUrl = JSON.parse(imageResponse.body).url;
+      if (feedback?.imageUrl && feedback?.videosUrl) {
+        const imageResponse = await getPresignedUrl(feedback.imageUrl);
+        const imageUrl = JSON.parse(imageResponse.body).url;
 
-      const imageFile = await urlToFile(imageUrl, 'image.png');
-      const imageUploadedUrl = await uploadFileToLinear(imageFile);
+        const imageFile = await urlToFile(imageUrl, 'image.png');
+        // upload file to your server first
+        let imageUploadedUrl;
+        try {
+          const response = await fetch('/api/uploadLinear', {
+            method: 'POST',
+            body: imageFile,
+          });
+          imageUploadedUrl = await response.json();
+        } catch (error) {
+          console.error('Error uploading file to server:', error);
+          return;
+        }
 
-      const videoUploadedUrl = await Promise.all(
-        videoSrcs.map(async (videoUrl) => {
-          const response = await getPresignedUrl(videoUrl);
-          const url = JSON.parse(response.body).url;
-          const videoFile = await urlToFile(url, 'video.mp4');
-          return uploadFileToLinear(videoFile);
-        })
-      );
+        const videoUploadedUrl = await Promise.all(
+          videoSrcs.map(async (videoUrl) => {
+            const response = await getPresignedUrl(videoUrl);
+            const url = JSON.parse(response.body).url;
+            const videoFile = await urlToFile(url, 'video.mp4');
+            // upload file to your server first
+            let videoUploadedUrl;
+            try {
+              const response = await fetch('/api/uploadLinear', {
+                method: 'POST',
+                body: videoFile,
+              });
+              videoUploadedUrl = await response.json();
+            } catch (error) {
+              console.error('Error uploading file to server:', error);
+              return;
+            }
+            return videoUploadedUrl;
+          })
+        );
 
-      const { description, priority } = convertDataToMarkdownFormat(
-        data,
-        imageUploadedUrl,
-        videoUploadedUrl
-      );
+        const { description, priority } = convertDataToMarkdownFormat(
+          data,
+          imageUploadedUrl,
+          videoUploadedUrl
+        );
 
-      await createIssue({
-        title: 'Issue for Bug fix',
-        description: description,
-        priority: priority,
-      });
+        await createIssue({
+          title: 'Issue for Bug fix',
+          description: description,
+          priority: priority,
+        });
+      }
       // reset();
       enqueueSnackbar('Create success!');
       // router.push(paths.dashboard.task.root);
