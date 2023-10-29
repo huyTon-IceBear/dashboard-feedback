@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { useCallback, useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
@@ -10,9 +10,6 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import MenuItem from '@mui/material/MenuItem';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { paths } from 'src/routes/paths';
-// hooks
-import { useResponsive } from 'src/hooks/use-responsive';
 // _mock
 import {
   TASK_SEVERITY_EFFECT_OPTIONS,
@@ -69,7 +66,8 @@ export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) 
   const defaultValues = useMemo(
     () => ({
       reportBy: feedback?.created_by || currentTask?.reportBy || '',
-      dateReported: feedback?.created_at || currentTask?.dateReported || '',
+      dateReported:
+        convertToDisplayFormat(feedback?.created_at || '') || currentTask?.dateReported || '',
       module: currentTask?.module || TASK_MODULES_OPTIONS[0].value,
       severity: currentTask?.severity || TASK_SEVERITY_OPTIONS[0].value,
       severityEffect: currentTask?.severityEffect || TASK_SEVERITY_EFFECT_OPTIONS[0].value,
@@ -251,7 +249,7 @@ export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) 
           <Typography variant="subtitle2">Reported by</Typography>
           <RHFTextField name="reportBy" placeholder="Type something..." />
         </Stack>
-        {/* <Stack alignItems="baseline" sx={{ mb: 1 }}>
+        <Stack alignItems="baseline" sx={{ mb: 1 }}>
           <Typography variant="subtitle2">Date reported</Typography>
           <Controller
             name="dateReported"
@@ -270,7 +268,7 @@ export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) 
               />
             )}
           />
-        </Stack> */}
+        </Stack>
       </Box>
       <Stack sx={{ p: 3 }} spacing={1}>
         <Typography variant="subtitle2">Application/Module*</Typography>
@@ -398,4 +396,10 @@ function convertDataToMarkdownFormat(
       ? 3
       : 4;
   return { description, priority };
+}
+
+function convertToDisplayFormat(dateStr: string) {
+  // Parse string to Date object
+  const dateObj = new Date(dateStr);
+  return dateObj;
 }

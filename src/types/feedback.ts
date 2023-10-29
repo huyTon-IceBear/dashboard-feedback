@@ -45,5 +45,5 @@ export type FeedbackBugFixType = {
   imageUrl: string;
   videosUrl: string[];
   created_by: string;
-  created_at: Date;
+  created_at: string;
 };
