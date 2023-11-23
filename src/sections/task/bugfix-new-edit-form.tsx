@@ -34,6 +34,8 @@ import { TaskBugfix, TaskBugfixData } from 'src/types/task';
 import { createIssue } from 'src/api/createTask';
 import { FeedbackBugFixType } from 'src/types/feedback';
 import { downloadMediaFile } from 'src/api/downloadMedia';
+import { getIssues } from 'src/api/getTask';
+import uploadToLinear from 'src/api/uploadToLinear';
 
 // ----------------------------------------------------------------------
 
@@ -43,8 +45,6 @@ type Props = {
 };
 
 export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) {
-  const router = useRouter();
-
   const { enqueueSnackbar } = useSnackbar();
 
   const NewTaskSchema = Yup.object().shape({
@@ -72,9 +72,9 @@ export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) 
       severity: currentTask?.severity || TASK_SEVERITY_OPTIONS[0].value,
       severityEffect: currentTask?.severityEffect || TASK_SEVERITY_EFFECT_OPTIONS[0].value,
       priority: currentTask?.severityEffect || TASK_PRIORITY_OPTIONS[0].value,
-      stepToProduce: currentTask?.stepToProduce || '',
-      expectedResult: currentTask?.expectedResult || '',
-      actualResult: currentTask?.actualResult || '',
+      stepToProduce: currentTask?.stepToProduce || 'abc',
+      expectedResult: currentTask?.expectedResult || 'abc',
+      actualResult: currentTask?.actualResult || 'abc',
       //
       description: feedback?.description || currentTask?.description || '',
       preCondition: currentTask?.preCondition || '',
@@ -114,6 +114,7 @@ export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) 
   };
 
   useEffect(() => {
+    getIssues();
     if (feedback?.imageUrl) {
       getPresignedUrl(feedback.imageUrl).then((response) => {
         const parsedResponse = JSON.parse(response.body);
@@ -133,64 +134,33 @@ export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) 
     }
   }, [feedback]);
 
-  async function urlToFile(url: string, filename: string): Promise<File> {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    return new File([blob], filename, { type: blob.type });
-  }
-
   const onSubmit = handleSubmit(async (data) => {
     try {
       if (feedback?.imageUrl && feedback?.videosUrl) {
-        const imageResponse = await getPresignedUrl(feedback.imageUrl);
-        const imageUrl = JSON.parse(imageResponse.body).url;
-
-        const imageFile = await urlToFile(imageUrl, 'image.png');
-        // upload file to your server first
-        let imageUploadedUrl;
-        try {
-          const response = await fetch('/api/uploadLinear', {
-            method: 'POST',
-            body: imageFile,
-          });
-          imageUploadedUrl = await response.json();
-        } catch (error) {
-          console.error('Error uploading file to server:', error);
-          return;
-        }
-
-        const videoUploadedUrl = await Promise.all(
+        const videoUploadedUrls = await Promise.all(
           videoSrcs.map(async (videoUrl) => {
-            const response = await getPresignedUrl(videoUrl);
-            const url = JSON.parse(response.body).url;
-            const videoFile = await urlToFile(url, 'video.mp4');
-            // upload file to your server first
-            let videoUploadedUrl;
-            try {
-              const response = await fetch('/api/uploadLinear', {
-                method: 'POST',
-                body: videoFile,
-              });
-              videoUploadedUrl = await response.json();
-            } catch (error) {
-              console.error('Error uploading file to server:', error);
-              return;
-            }
+            let videoUploadedUrl = await uploadToLinear(videoUrl);
             return videoUploadedUrl;
           })
         );
 
-        const { description, priority } = convertDataToMarkdownFormat(
-          data,
-          imageUploadedUrl,
-          videoUploadedUrl
-        );
+        console.log('feedback?.imageUrl', feedback?.imageUrl);
+        console.log('feedback?.imageUrl', feedback?.imageUrl);
+        console.log('videoUploadedUrl', videoUploadedUrls);
+        console.log('feedback?.videosUrl', imageSrc);
+        console.log('feedback?.videosUrl', videoSrcs[0]);
 
-        await createIssue({
-          title: 'Issue for Bug fix',
-          description: description,
-          priority: priority,
-        });
+        // const { description, priority } = convertDataToMarkdownFormat(
+        //   data,
+        //   imageSrc,
+        //   videoUploadedUrls
+        // );
+
+        // await createIssue({
+        //   title: 'Issue for Bug fix',
+        //   description: description,
+        //   priority: priority,
+        // });
       }
       // reset();
       enqueueSnackbar('Create success!');

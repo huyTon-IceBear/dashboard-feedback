@@ -62,6 +62,7 @@
     "mui-one-time-password-input": "^2.0.0",
     "multer": "^1.4.5-lts.1",
     "next": "^13.4.19",
+    "node-fetch": "^2.6.1",
     "notistack": "^3.0.1",
     "nprogress": "^0.2.0",
     "numeral": "^2.0.6",

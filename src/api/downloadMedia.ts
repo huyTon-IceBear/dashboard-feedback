@@ -1,10 +1,7 @@
-import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { S3Client } from "@aws-sdk/client-s3";
-import type { NextApiRequest, NextApiResponse } from "next";
 
-
-export async function downloadMediaFile(Key: string, expiresIn = 80) {
+export async function downloadMediaFile(Key: string, expiresIn = 60) {
 	// Ensure that AWS_MONITORING_BUCKET_KEY and AWS_MONITORING_BUCKET_SECRET are strings
 	const accessKeyId = process.env.NEXT_PUBLIC_AWS_MONITORING_BUCKET_KEY as string;
 	const secretAccessKey = process.env.NEXT_PUBLIC_AWS_MONITORING_BUCKET_SECRET as string
