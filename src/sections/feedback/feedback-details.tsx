@@ -18,7 +18,6 @@ import { Feedback } from 'src/types/feedback';
 import Iconify from 'src/components/iconify';
 import Image from 'src/components/image';
 import Lightbox, { useLightBox } from 'src/components/lightbox';
-import { downloadMediaFile } from 'src/api/downloadMedia';
 
 // ----------------------------------------------------------------------
 
@@ -33,24 +32,37 @@ export default function FeedbackDetails({ feedback }: Props) {
   const [imageSrc, setImageSrc] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const getPresignedUrl = async (key: string) => {
-    return await downloadMediaFile(`monitoring/medias/${key}`);
+  const getPresignedUrl = async (fileName: string) => {
+    const response = await fetch('/api/aws-s3', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_name: fileName }),
+    });
+    return response.json();
+  };
+
+  const getIssues = async () => {
+    const response = await fetch('/api/linear', {
+      method: 'GET',
+    });
+    return response.json();
   };
 
   useEffect(() => {
     getPresignedUrl(imageUrl).then((response) => {
-      const parsedResponse = JSON.parse(response.body);
-      setImageSrc(parsedResponse.url);
+      setImageSrc(response.url);
     });
-
     Promise.all(videosUrl.map((videoUrl) => getPresignedUrl(videoUrl)))
       .then((responses) => {
-        const parsedResponses = responses.map((response) => JSON.parse(response.body));
-        setVideoSrcs(parsedResponses.map((parsedResponse) => parsedResponse.url));
+        setVideoSrcs(responses.map((response) => response.url));
       })
       .then(() => {
         setIsLoading(false);
       });
+
+    getIssues().then((response) => {
+      console.log(response);
+    });
   }, [imageUrl, videosUrl]);
 
   const renderMediaFile = (

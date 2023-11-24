@@ -20,7 +20,6 @@ import {
 } from 'src/_mock';
 // components
 import { useSnackbar } from 'src/components/snackbar';
-import { useRouter } from 'src/routes/hooks';
 import FormProvider, {
   RHFSelect,
   RHFEditor,
@@ -33,10 +32,6 @@ import Image from 'src/components/image';
 import { TaskBugfix, TaskBugfixData } from 'src/types/task';
 import { createIssue } from 'src/api/createTask';
 import { FeedbackBugFixType } from 'src/types/feedback';
-import { downloadMediaFile } from 'src/api/downloadMedia';
-import { getIssues } from 'src/api/getTask';
-import uploadToLinear from 'src/api/uploadToLinear';
-
 // ----------------------------------------------------------------------
 
 type Props = {
@@ -109,24 +104,34 @@ export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) 
   const [imageSrc, setImageSrc] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const getPresignedUrl = async (key: string) => {
-    return await downloadMediaFile(`monitoring/medias/${key}`);
+  const getPresignedUrl = async (fileName: string) => {
+    const response = await fetch('/api/aws-s3', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_name: fileName }),
+    });
+    return response.json();
+  };
+
+  const uploadToLinear = async (fileUrl: string) => {
+    const response = await fetch('/api/linearStorage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ presignedUrl: fileUrl }),
+    });
+    return response.json();
   };
 
   useEffect(() => {
-    getIssues();
     if (feedback?.imageUrl) {
       getPresignedUrl(feedback.imageUrl).then((response) => {
-        const parsedResponse = JSON.parse(response.body);
-        setImageSrc(parsedResponse.url);
+        setImageSrc(response.url);
       });
     }
-
     if (feedback?.videosUrl) {
       Promise.all(feedback.videosUrl.map((videoUrl) => getPresignedUrl(videoUrl)))
         .then((responses) => {
-          const parsedResponses = responses.map((response) => JSON.parse(response.body));
-          setVideoSrcs(parsedResponses.map((parsedResponse) => parsedResponse.url));
+          setVideoSrcs(responses.map((response) => response.url));
         })
         .then(() => {
           setIsLoading(false);
@@ -136,35 +141,47 @@ export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) 
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      if (feedback?.imageUrl && feedback?.videosUrl) {
+      const videoUrls = feedback?.videosUrl;
+
+      if (feedback?.imageUrl && videoUrls) {
+        const imageUrl = await getPresignedUrl(feedback.imageUrl).then((response) => {
+          return response.url;
+        });
         const videoUploadedUrls = await Promise.all(
-          videoSrcs.map(async (videoUrl) => {
-            let videoUploadedUrl = await uploadToLinear(videoUrl);
-            return videoUploadedUrl;
+          videoUrls.map(async (videoUrl) => {
+            if (videoUrl) {
+              return getPresignedUrl(videoUrl);
+            }
           })
+        )
+          .then((responses) =>
+            Promise.all(
+              responses.map(async (response) => {
+                if (response) {
+                  return uploadToLinear(response.url);
+                }
+              })
+            )
+          )
+          .then(
+            (videoObjects) => videoObjects.filter(Boolean).map((videoObj) => videoObj.assetUrl) // extract assetUrl from each object
+          );
+
+        console.log('videoUploadedUrl', videoUploadedUrls);
+
+        const { description, priority } = convertDataToMarkdownFormat(
+          data,
+          imageUrl,
+          videoUploadedUrls.filter(Boolean) as string[] // filter out any undefined values
         );
 
-        console.log('feedback?.imageUrl', feedback?.imageUrl);
-        console.log('feedback?.imageUrl', feedback?.imageUrl);
-        console.log('videoUploadedUrl', videoUploadedUrls);
-        console.log('feedback?.videosUrl', imageSrc);
-        console.log('feedback?.videosUrl', videoSrcs[0]);
-
-        // const { description, priority } = convertDataToMarkdownFormat(
-        //   data,
-        //   imageSrc,
-        //   videoUploadedUrls
-        // );
-
-        // await createIssue({
-        //   title: 'Issue for Bug fix',
-        //   description: description,
-        //   priority: priority,
-        // });
+        await createIssue({
+          title: 'Issue for Bug fix',
+          description: description,
+          priority: priority,
+        });
       }
-      // reset();
       enqueueSnackbar('Create success!');
-      // router.push(paths.dashboard.task.root);
     } catch (error) {
       console.error(error);
     }
@@ -339,7 +356,7 @@ function convertDataToMarkdownFormat(
   videosUrl: string[]
 ) {
   const videoLinksMarkdown = videosUrl
-    .map((url, index) => `* **Video ${index + 1}:** [Video Link](${url})`)
+    .map((url, index) => `\n\n [screen_recording(${index + 1}).mp4](${url})`)
     .join('\n');
 
   const description = `
@@ -353,7 +370,7 @@ function convertDataToMarkdownFormat(
   * **Expected Result:** ${formData?.expectedResult?.replace(/<[^>]*>/g, '')}
   * **Actual Result:** ${formData?.actualResult?.replace(/<[^>]*>/g, '')}
   * **Screenshot:** \n ![Screenshot](${imageUrl})
-  * **Videos:** \n ${videoLinksMarkdown}
+  * **Videos:** ${videoLinksMarkdown}
   * **Additional Information:** ${formData?.additionalInformation?.replace(/<[^>]*>/g, '')}
   `;
 

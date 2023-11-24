@@ -37,7 +37,6 @@ export default async function uploadToLinear (presignedUrl:string) {
     const uploadUrl = uploadPayload.uploadFile.uploadUrl;
     const assetUrl = uploadPayload.uploadFile.assetUrl;
 
-
     // Make sure to copy the response headers for the PUT request
     const headers = new Headers();
 
