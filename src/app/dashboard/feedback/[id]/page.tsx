@@ -1,13 +1,22 @@
-// _mock
-import { _feedbacks } from 'src/_mock/_feedback';
 // sections
 import { FeedbackDetailsView } from 'src/sections/feedback/view';
+
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 
 // ----------------------------------------------------------------------
 
 export const metadata = {
   title: 'Dashboard: Feedback Details',
 };
+
+const client = new ApolloClient({
+  uri: 'https://your-graphql-endpoint.com',
+  cache: new InMemoryCache(),
+});
+
+interface Feedback {
+  id: string;
+}
 
 type Props = {
   params: {
@@ -22,7 +31,15 @@ export default function FeedbackDetailsPage({ params }: Props) {
 }
 
 export async function generateStaticParams() {
-  return _feedbacks.map((feedback) => ({
-    id: feedback.id,
-  }));
+  const { data } = await client.query({
+    query: gql`
+      query GET_FEEDBACKS {
+        feedback {
+          id
+        }
+      }
+    `,
+  });
+
+  return data.feedback.map((feedback: Feedback) => ({ id: feedback.id }));
 }

@@ -123,6 +123,7 @@ export default function FeedbackTableRow({
 
         <MenuItem
           onClick={() => {
+            onViewRow();
             popover.onClose();
           }}
         >
