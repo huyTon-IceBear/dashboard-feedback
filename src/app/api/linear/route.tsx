@@ -16,6 +16,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const { TaskData } = await request.json();
+  console.log('TaskData', TaskData);
   const teams = await client1.teams();
   try {
     if (teams.nodes[0].id) {

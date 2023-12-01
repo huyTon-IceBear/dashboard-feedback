@@ -30,8 +30,7 @@ import FormProvider, {
   RHFRadioGroup,
 } from 'src/components/hook-form';
 // types
-import { TaskRFC, TaskRFCData } from 'src/types/task';
-import { createIssue } from 'src/api/createTask';
+import { TaskRFC, TaskRFCData, TaskLinear } from 'src/types/task';
 import { FeedbackRFCType } from 'src/types/feedback';
 
 // ----------------------------------------------------------------------
@@ -102,11 +101,20 @@ export default function RFCTaskNewEditForm({ currentTask, feedback }: Props) {
     }
   }, [currentTask, defaultValues, reset]);
 
+  const createLinearTask = async (taskData: TaskLinear) => {
+    const response = await fetch('/api/linear', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ TaskData: taskData }),
+    });
+    return response.json();
+  };
+
   const onSubmit = handleSubmit(async (data) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));
       const { description, priority } = convertDataToMarkdownFormat(data);
-      createIssue({
+      createLinearTask({
         title: 'Issue for RFC',
         description: description,
         priority: priority,

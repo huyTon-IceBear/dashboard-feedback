@@ -29,8 +29,7 @@ import FormProvider, {
 } from 'src/components/hook-form';
 import Image from 'src/components/image';
 // types
-import { TaskBugfix, TaskBugfixData } from 'src/types/task';
-import { createIssue } from 'src/api/createTask';
+import { TaskBugfix, TaskBugfixData, TaskLinear } from 'src/types/task';
 import { FeedbackBugFixType } from 'src/types/feedback';
 // ----------------------------------------------------------------------
 
@@ -114,10 +113,19 @@ export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) 
   };
 
   const uploadToLinear = async (fileUrl: string) => {
-    const response = await fetch('/api/linearStorage', {
+    const response = await fetch('/api/linear/storage', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ presignedUrl: fileUrl }),
+    });
+    return response.json();
+  };
+
+  const createLinearTask = async (taskData: TaskLinear) => {
+    const response = await fetch('/api/linear', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ TaskData: taskData }),
     });
     return response.json();
   };
@@ -175,7 +183,7 @@ export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) 
           videoUploadedUrls.filter(Boolean) as string[] // filter out any undefined values
         );
 
-        await createIssue({
+        await createLinearTask({
           title: 'Issue for Bug fix',
           description: description,
           priority: priority,
