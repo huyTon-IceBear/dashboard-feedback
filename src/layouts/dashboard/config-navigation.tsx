@@ -32,7 +32,7 @@ export function useNavData() {
         items: [
           {
             title: t('analytics'),
-            path: paths.dashboard.general.analytics,
+            path: paths.dashboard.root,
             icon: ICONS.analytics,
           },
           {
