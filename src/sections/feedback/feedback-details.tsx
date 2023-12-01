@@ -63,7 +63,7 @@ export default function FeedbackDetails({ feedback }: Props) {
     getIssues().then((response) => {
       console.log(response);
     });
-  }, [imageUrl, videosUrl]);
+  }, []);
 
   const renderMediaFile = (
     <Stack spacing={2}>

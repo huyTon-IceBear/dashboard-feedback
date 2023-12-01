@@ -35,10 +35,10 @@ export default function FeedbackDetailsView({ id }: Props) {
         <>
           <FeedbackToolbar
             backLink={paths.dashboard.task.root}
-            feedbackIssue={data?.feedback_by_pk?.issue}
-            feedbackId={data?.feedback_by_pk?.id}
+            feedbackIssue={data.feedback_by_pk.issue}
+            feedbackId={data.feedback_by_pk.id}
           />
-          <FeedbackDetails feedback={data?.feedback_by_pk} />
+          <FeedbackDetails feedback={data.feedback_by_pk} />
         </>
       )}
     </Container>

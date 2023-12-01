@@ -1,7 +1,7 @@
 // sections
 import { FeedbackDetailsView } from 'src/sections/feedback/view';
 
-import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import { ApolloClient, InMemoryCache, createHttpLink, gql } from '@apollo/client';
 
 // ----------------------------------------------------------------------
 
@@ -9,8 +9,16 @@ export const metadata = {
   title: 'Dashboard: Feedback Details',
 };
 
+const httpLink = createHttpLink({
+  uri: process.env.NEXT_PUBLIC_HASURA_URL,
+  headers: {
+    'content-type': 'application/json',
+    'x-hasura-admin-secret': process.env.NEXT_PUBLIC_MONITORING_HASURA_ADMIN_SECRET as string,
+  },
+});
+
 const client = new ApolloClient({
-  uri: 'https://your-graphql-endpoint.com',
+  link: httpLink,
   cache: new InMemoryCache(),
 });
 
