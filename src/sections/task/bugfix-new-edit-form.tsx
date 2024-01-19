@@ -150,7 +150,6 @@ export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) 
   const onSubmit = handleSubmit(async (data) => {
     try {
       const videoUrls = feedback?.videosUrl;
-
       if (feedback?.imageUrl && videoUrls) {
         const imageUrl = await getPresignedUrl(feedback.imageUrl).then((response) => {
           return response.url;
@@ -174,8 +173,6 @@ export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) 
           .then(
             (videoObjects) => videoObjects.filter(Boolean).map((videoObj) => videoObj.assetUrl) // extract assetUrl from each object
           );
-
-        console.log('videoUploadedUrl', videoUploadedUrls);
 
         const { description, priority } = convertDataToMarkdownFormat(
           data,

@@ -1,7 +1,5 @@
 // Linear SDK
-import { LinearClient, LinearFetch, User } from '@linear/sdk';
-import { TaskLinear } from 'src/types/task';
-
+import { LinearClient } from '@linear/sdk';
 import { LINEAR_API_TEST } from 'src/config-global';
 
 // Api key authentication
@@ -16,7 +14,6 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const { TaskData } = await request.json();
-  console.log('TaskData', TaskData);
   const teams = await client1.teams();
   try {
     if (teams.nodes[0].id) {
