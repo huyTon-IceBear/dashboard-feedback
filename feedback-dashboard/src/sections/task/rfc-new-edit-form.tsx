@@ -25,8 +25,10 @@ import FormProvider, {
   RHFRadioGroup,
 } from 'src/components/hook-form';
 // types
-import { TaskRFC, TaskRFCData, TaskLinear } from 'src/types/task';
+import { TaskRFC, TaskRFCData, TaskLinear, INSERT_TASK_MUTATION } from 'src/types/task';
 import { FeedbackRFCType } from 'src/types/feedback';
+import { useMutation } from '@apollo/client';
+import { INSERT_LINEAR_TASK } from 'src/graphql/task';
 
 // ----------------------------------------------------------------------
 
@@ -105,18 +107,32 @@ export default function RFCTaskNewEditForm({ currentTask, feedback }: Props) {
     return response.json();
   };
 
+  const [insertTask, { loading }] = useMutation<INSERT_TASK_MUTATION>(INSERT_LINEAR_TASK, {
+    onCompleted: () => {
+      reset();
+      router.push(paths.dashboard.task.root);
+    },
+  });
+
   const onSubmit = handleSubmit(async (data) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));
       const { description, priority } = convertDataToMarkdownFormat(data);
-      createLinearTask({
+      await createLinearTask({
         title: 'Issue for RFC',
         description: description,
         priority: priority,
       });
-      reset();
+      insertTask({
+        variables: {
+          object: {
+            feedback_id: feedback?.id,
+            title: 'Issue for RFC',
+            description: description,
+          },
+        },
+      });
       enqueueSnackbar('Create success!');
-      // router.push(paths.dashboard.task.root);
     } catch (error) {
       console.error(error);
     }

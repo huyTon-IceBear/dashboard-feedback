@@ -22,27 +22,28 @@ import { useBoolean } from 'src/hooks/use-boolean';
 // components
 import Iconify from 'src/components/iconify';
 import { RouterLink } from 'src/routes/components';
-import { FEEDBACK_ISSUE_OPTIONS } from 'src/_mock';
 // ----------------------------------------------------------------------
 
 type Props = StackProps & {
   backLink: string;
   feedbackIssue: string;
   feedbackId: string;
+  issues: string[];
 };
 
 export default function FeedbackToolbar({
   backLink,
   feedbackIssue,
   feedbackId,
+  issues,
   sx,
   ...other
 }: Props) {
   const router = useRouter();
-
+  console.log(issues);
   const handleCreateTask = useCallback(() => {
     const createTaskPath =
-      feedbackIssue.toLocaleLowerCase() !== FEEDBACK_ISSUE_OPTIONS[0].value.toLocaleLowerCase()
+      feedbackIssue.toLocaleLowerCase() === issues[0].toLocaleLowerCase()
         ? paths.dashboard.task.new.rfc
         : paths.dashboard.task.new.bugfix;
     router.push(`${createTaskPath}?feedbackId=${feedbackId}`);

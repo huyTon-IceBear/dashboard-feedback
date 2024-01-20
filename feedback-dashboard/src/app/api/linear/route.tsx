@@ -27,5 +27,5 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error(`Internal server error: Something went wrong creating issue on Linear`);
   }
-  return new Response('OK');
+  return Response.json({ response: 'OK' });
 }

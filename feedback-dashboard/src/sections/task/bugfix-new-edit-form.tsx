@@ -28,8 +28,12 @@ import FormProvider, {
 } from 'src/components/hook-form';
 import Image from 'src/components/image';
 // types
-import { TaskBugfix, TaskBugfixData, TaskLinear } from 'src/types/task';
+import { INSERT_TASK_MUTATION, TaskBugfix, TaskBugfixData, TaskLinear } from 'src/types/task';
 import { FeedbackBugFixType } from 'src/types/feedback';
+import { useMutation } from '@apollo/client';
+import { INSERT_LINEAR_TASK } from 'src/graphql/task';
+import { useRouter } from 'next/router';
+import { paths } from 'src/routes/paths';
 // ----------------------------------------------------------------------
 
 type Props = {
@@ -39,6 +43,7 @@ type Props = {
 
 export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) {
   const { enqueueSnackbar } = useSnackbar();
+  const router = useRouter();
 
   const NewTaskSchema = Yup.object().shape({
     reportBy: Yup.string().required('Field is required'),
@@ -146,6 +151,13 @@ export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) 
     }
   }, [feedback]);
 
+  const [insertTask, { loading }] = useMutation<INSERT_TASK_MUTATION>(INSERT_LINEAR_TASK, {
+    onCompleted: () => {
+      reset();
+      router.push(paths.dashboard.task.root);
+    },
+  });
+
   const onSubmit = handleSubmit(async (data) => {
     try {
       const videoUrls = feedback?.videosUrl;
@@ -183,6 +195,16 @@ export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) 
           title: 'Issue for Bug fix',
           description: description,
           priority: priority,
+        });
+
+        insertTask({
+          variables: {
+            object: {
+              feedback_id: feedback?.id,
+              title: 'Issue for RFC',
+              description: description,
+            },
+          },
         });
       }
       enqueueSnackbar('Create success!');

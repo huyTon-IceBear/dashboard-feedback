@@ -36,11 +36,13 @@ export type FeedbackDatagrids = {
 };
 
 export type FeedbackRFCType = {
+  id: string;
   description: string;
   created_by: string;
 };
 
 export type FeedbackBugFixType = {
+  id: string;
   description: string;
   imageUrl: string;
   videosUrl: string[];
