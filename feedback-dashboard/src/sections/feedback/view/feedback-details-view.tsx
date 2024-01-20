@@ -4,8 +4,6 @@ import { useQuery } from '@apollo/client';
 import Container from '@mui/material/Container';
 // routes
 import { paths } from 'src/routes/paths';
-// _mock
-import { _feedbacks } from 'src/_mock';
 // components
 import { useSettingsContext } from 'src/components/settings';
 //

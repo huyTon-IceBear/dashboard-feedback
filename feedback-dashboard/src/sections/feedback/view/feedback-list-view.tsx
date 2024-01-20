@@ -23,10 +23,8 @@ import { RouterLink } from 'src/routes/components';
 import { useBoolean } from 'src/hooks/use-boolean';
 // utils
 import { fTimestamp } from 'src/utils/format-time';
-// _mock
-import { _feedbacks, FEEDBACK_ISSUE_OPTIONS, FEEDBACK_ELEMENT_OPTIONS } from 'src/_mock';
 // components
-import Label from 'src/components/label';
+import Label, { LabelColor } from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 import { ConfirmDialog } from 'src/components/custom-dialog';
@@ -48,11 +46,20 @@ import {
   FeedbackDatagrids,
   FeedbackTableFilters,
   FeedbackTableFilterValue,
+  FeedbackType,
+  FeedbackElement,
+  FeedbackIssue,
 } from 'src/types/feedback';
 //
 import FeedbackTableRow from '../feedback-table-row';
 import FeedbackTableToolbar from '../feedback-table-toolbar';
 import FeedbackTableFiltersResult from '../feedback-table-filters-result';
+import {
+  GET_FEEDBACKS,
+  GET_FEEDBACK_TYPES,
+  GET_FEEDBACK_ELEMENTS,
+  GET_FEEDBACK_ISSUES,
+} from 'src/graphql/feedback';
 
 // ----------------------------------------------------------------------
 
@@ -74,20 +81,6 @@ const defaultFilters: FeedbackTableFilters = {
 
 // ----------------------------------------------------------------------
 
-const GET_FEEDBACKS = gql`
-  query GET_FEEDBACKS {
-    feedback {
-      id
-      description
-      element
-      issue
-      type
-      created_at
-      created_by
-    }
-  }
-`;
-
 export default function FeedbackListView() {
   const theme = useTheme();
 
@@ -100,12 +93,29 @@ export default function FeedbackListView() {
   const confirm = useBoolean();
 
   const [tableData, setTableData] = useState<FeedbackDatagrids[]>([]);
-
+  const [issues, setIssue] = useState<FeedbackIssue[]>([]);
+  const [element, setElement] = useState<FeedbackElement[]>([]);
+  const [type, setType] = useState<FeedbackType[]>([]);
   const [filters, setFilters] = useState(defaultFilters);
 
-  const { loading, error } = useQuery(GET_FEEDBACKS, {
+  const { loading } = useQuery(GET_FEEDBACKS, {
     onCompleted: (data) => {
       setTableData(data.feedback);
+    },
+  });
+  useQuery(GET_FEEDBACK_TYPES, {
+    onCompleted: (data) => {
+      setType(data.feedback_type);
+    },
+  });
+  useQuery(GET_FEEDBACK_ELEMENTS, {
+    onCompleted: (data) => {
+      setElement(data.feedback_element);
+    },
+  });
+  useQuery(GET_FEEDBACK_ISSUES, {
+    onCompleted: (data) => {
+      setIssue(data.feedback_issue);
     },
   });
 
@@ -136,18 +146,12 @@ export default function FeedbackListView() {
 
   const TABS = [
     { value: 'all', label: 'All', color: 'default', count: tableData.length },
-    {
-      value: 'positive',
-      label: 'Positive',
-      color: 'success',
-      count: getFeedbackLength('positive'),
-    },
-    {
-      value: 'negative',
-      label: 'Negative',
-      color: 'error',
-      count: getFeedbackLength('negative'),
-    },
+    ...type.map((type) => ({
+      value: type.value,
+      label: type.label,
+      color: type.color as LabelColor,
+      count: getFeedbackLength(type.value),
+    })),
   ] as const;
 
   const handleFilters = useCallback(
@@ -256,8 +260,8 @@ export default function FeedbackListView() {
             filters={filters}
             onFilters={handleFilters}
             //
-            issueOptions={FEEDBACK_ISSUE_OPTIONS.map((issue) => issue.value)}
-            elementOptions={FEEDBACK_ELEMENT_OPTIONS.map((element) => element.value)}
+            issueOptions={issues.map((issue) => issue.value)}
+            elementOptions={element.map((element) => element.value)}
           />
 
           {canReset && (
@@ -413,15 +417,15 @@ function applyFilter({
   }
 
   if (type !== 'all') {
-    inputData = inputData.filter((feedback) => feedback.type === type);
+    inputData = inputData.filter((feedback) => feedback.type.toLowerCase() === type);
   }
 
   if (issue !== '') {
-    inputData = inputData.filter((feedback) => feedback.issue === issue);
+    inputData = inputData.filter((feedback) => feedback.issue.toLowerCase() === issue);
   }
 
   if (element !== '') {
-    inputData = inputData.filter((feedback) => feedback.element === element);
+    inputData = inputData.filter((feedback) => feedback.element.toLowerCase() === element);
   }
 
   if (startDate) {

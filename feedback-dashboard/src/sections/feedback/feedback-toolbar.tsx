@@ -18,7 +18,7 @@ import { useRouter } from 'src/routes/hooks';
 // hooks
 import { useBoolean } from 'src/hooks/use-boolean';
 // types
-import { IInvoice } from 'src/types/invoice';
+
 // components
 import Iconify from 'src/components/iconify';
 import { RouterLink } from 'src/routes/components';

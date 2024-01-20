@@ -5,8 +5,7 @@ import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Stack, { StackProps } from '@mui/material/Stack';
 // types
-import { IInvoiceTableFilters, IInvoiceTableFilterValue } from 'src/types/invoice';
-import { Feedback, FeedbackTableFilters, FeedbackTableFilterValue } from 'src/types/feedback';
+import { FeedbackTableFilters, FeedbackTableFilterValue } from 'src/types/feedback';
 // components
 import Iconify from 'src/components/iconify';
 import { shortDateLabel } from 'src/components/custom-date-range-picker';
