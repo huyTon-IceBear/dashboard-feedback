@@ -47,3 +47,20 @@ export type FeedbackBugFixType = {
   created_by: string;
   created_at: string;
 };
+
+export type FeedbackType = {
+  value: string;
+  label: string;
+  color: string;
+};
+
+export type FeedbackElement = {
+  value: string;
+  label: string;
+};
+
+
+export type FeedbackIssue = {
+  value: string;
+  label: string;
+};

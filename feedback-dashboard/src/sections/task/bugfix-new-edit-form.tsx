@@ -16,7 +16,6 @@ import {
   TASK_MODULES_OPTIONS,
   TASK_PRIORITY_OPTIONS,
   TASK_SEVERITY_OPTIONS,
-  _feedbacks,
 } from 'src/_mock';
 // components
 import { useSnackbar } from 'src/components/snackbar';
