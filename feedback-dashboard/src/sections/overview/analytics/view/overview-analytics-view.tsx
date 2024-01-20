@@ -17,11 +17,74 @@ import { useSettingsContext } from 'src/components/settings';
 import AnalyticsCurrentVisits from '../analytics-current-visits';
 import AnalyticsWebsiteVisits from '../analytics-website-visits';
 import AnalyticsWidgetSummary from '../analytics-widget-summary';
+import { subDays, format } from 'date-fns';
+import { gql, useQuery } from '@apollo/client';
+import { useEffect, useState } from 'react';
+import {
+  GET_FEEDBACK_BEFORE_DATE,
+  GET_FEEDBACK_TOTAL,
+  GET_FEEDBACK_SUM_ON_TYPE,
+} from 'src/graphql/feedback';
 
 // ----------------------------------------------------------------------
+// Define the type for feedback
+type Feedback = {
+  created_at: string;
+};
 
 export default function OverviewAnalyticsView() {
   const settings = useSettingsContext();
+  const labels = generateDateLabels();
+  const [requestDate, setRequestDate] = useState<string>();
+  const [countPerLabel, setCountPerLabel] = useState<number[]>([]);
+  const [totalFeedback, setTotalFeedback] = useState<number>(0);
+  const [totalNegativeFeedback, setTotalNegativeFeedback] = useState<number>(0);
+  const [totalPositiveFeedback, setTotalPositiveFeedback] = useState<number>(0);
+
+  const { loading } = useQuery(GET_FEEDBACK_BEFORE_DATE, {
+    variables: {
+      created_at: requestDate,
+    },
+    onCompleted: (data) => {
+      const feedbackCountPerLabel = labels.map((label) => {
+        const feedbackOnLabel = data.feedback.filter(
+          (feedback: Feedback) => format(new Date(feedback.created_at), 'MM/dd/yyyy') === label
+        );
+        return {
+          count: feedbackOnLabel.length,
+        };
+      });
+      setCountPerLabel(feedbackCountPerLabel.map((item) => item.count));
+    },
+  });
+
+  useEffect(() => {
+    setRequestDate(generateRequestDateLastWeek());
+  }, []);
+
+  useQuery(GET_FEEDBACK_TOTAL, {
+    onCompleted: (data) => {
+      setTotalFeedback(data.feedback_aggregate.aggregate.count);
+    },
+  });
+
+  useQuery(GET_FEEDBACK_SUM_ON_TYPE, {
+    variables: {
+      type: 'negative',
+    },
+    onCompleted: (data) => {
+      setTotalNegativeFeedback(data.feedback_aggregate.aggregate.count);
+    },
+  });
+
+  useQuery(GET_FEEDBACK_SUM_ON_TYPE, {
+    variables: {
+      type: 'positive',
+    },
+    onCompleted: (data) => {
+      setTotalPositiveFeedback(data.feedback_aggregate.aggregate.count);
+    },
+  });
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
@@ -35,74 +98,39 @@ export default function OverviewAnalyticsView() {
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid xs={12} sm={6} md={3}>
-          <AnalyticsWidgetSummary
-            title="User's Feedback Received"
-            total={714000}
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
-          />
+        <Grid xs={12} sm={6} md={4}>
+          <AnalyticsWidgetSummary title="Feedbacks Received" total={totalFeedback} />
         </Grid>
 
-        <Grid xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={4}>
           <AnalyticsWidgetSummary
-            title="Task Created"
-            total={234}
+            title="Positive Feedback Received"
+            total={totalPositiveFeedback}
             color="info"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_message.png" />}
           />
         </Grid>
 
-        <Grid xs={12} md={6} lg={8}>
+        <Grid xs={12} sm={6} md={4}>
+          <AnalyticsWidgetSummary
+            title="Negative Feedback Received"
+            total={totalNegativeFeedback}
+            color="error"
+          />
+        </Grid>
+
+        <Grid xs={12} md={6} lg={12}>
           <AnalyticsWebsiteVisits
-            title="Website Visits"
-            subheader="(+43%) than last year"
+            title="OpusFlow Recent Feedback"
+            subheader="From the last 7 days"
             chart={{
-              labels: [
-                '01/01/2003',
-                '02/01/2003',
-                '03/01/2003',
-                '04/01/2003',
-                '05/01/2003',
-                '06/01/2003',
-                '07/01/2003',
-                '08/01/2003',
-                '09/01/2003',
-                '10/01/2003',
-                '11/01/2003',
-              ],
+              labels: labels,
               series: [
                 {
                   name: 'Team A',
                   type: 'column',
                   fill: 'solid',
-                  data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30],
+                  data: countPerLabel,
                 },
-                {
-                  name: 'Team B',
-                  type: 'area',
-                  fill: 'gradient',
-                  data: [44, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43],
-                },
-                {
-                  name: 'Team C',
-                  type: 'line',
-                  fill: 'solid',
-                  data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39],
-                },
-              ],
-            }}
-          />
-        </Grid>
-
-        <Grid xs={12} md={6} lg={4}>
-          <AnalyticsCurrentVisits
-            title="Current Visits"
-            chart={{
-              series: [
-                { label: 'America', value: 4344 },
-                { label: 'Asia', value: 5435 },
-                { label: 'Europe', value: 1443 },
-                { label: 'Africa', value: 4443 },
               ],
             }}
           />
@@ -110,4 +138,18 @@ export default function OverviewAnalyticsView() {
       </Grid>
     </Container>
   );
+}
+
+function generateDateLabels() {
+  const today = new Date();
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = subDays(today, index);
+    return format(date, 'MM/dd/yyyy');
+  });
+}
+
+function generateRequestDateLastWeek() {
+  const today = new Date();
+  const lastWeek = subDays(today, 7);
+  return lastWeek.toISOString();
 }
