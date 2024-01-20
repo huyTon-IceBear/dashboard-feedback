@@ -19,6 +19,7 @@ export const GET_A_FEEDBACK = gql`
 export const GET_A_FEEDBACK_RFC = gql`
   query GET_A_FEEDBACK($id: uuid!) {
     feedback_by_pk(id: $id) {
+      id
       description
       created_by
     }

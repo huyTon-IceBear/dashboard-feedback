@@ -67,3 +67,13 @@ export type TaskLinear ={
   description: string;
   priority: number;
 }
+
+export type TaskLine ={
+  feedback_id: string;
+  title: string;
+  description: string;
+}
+
+export type INSERT_TASK_MUTATION = {
+	insert_task_one: TaskLine;
+};
