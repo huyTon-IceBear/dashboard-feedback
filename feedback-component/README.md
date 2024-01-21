@@ -48,11 +48,63 @@ To integrate the SnapFlow Feedback component into your Next.js, React, TypeScrip
 
 1. Add the `feedback-component` component to your project.
 
-2. Now, you can use the `FeedbackButton` component within your project.
+2. Install all needed dependencies
 
-3. Move the file located in the `api/feedback` folder to your project's API endpoint folder.
+3. Now, you can use the `FeedbackButton` component within your project.
 
-4. Ensure that your project is properly configured to handle the `/api/feedback/upload` endpoint. Adjust the endpoint path based on your project's API routing.
+4. Move the file located in the `api/feedback` folder to your project's API endpoint folder.
 
+5. Ensure that your project is properly configured to handle the `/api/feedback/upload` endpoint. Adjust the endpoint path based on your project's API routing.
 
+## Dependencies
+List of the dependencies inferred from the code:
+
+### React and related packages:
+- react: The core React library.
+- react-dom: For rendering React components in the DOM.
+- react-hook-form: Used for managing forms in React.
+- @hookform/resolvers/yup: Integration with Yup for form validation.
+- react-scripts: Necessary for scripts such as react-scripts start.
+
+```
+npm install react react-dom react-hook-form @hookform/resolvers/yup react-scripts
+```
+### Material-UI and Icons:
+- @mui/material: Material-UI library for React.
+- @mui/icons-material: Material-UI icons.
+
+```
+npm install @mui/material @mui/icons-material
+```
+
+### Apollo Client:
+- @apollo/client: Apollo Client for GraphQL communication.
+
+```
+npm install @apollo/client
+```
+
+### Yup: for schema validation.
+
+```
+npm install yup
+```
+
+### Others:
+- html2canvas: Used for capturing screenshots of the HTML content.
+- typescript: If not already installed, as some of the code snippets use TypeScript features.
+
+```
+npm install html2canvas typescript
+```
+
+### Development Dependencies (for Next.js projects):
+- next: If the project uses Next.js.
+- next-images: For handling images in Next.js.
+- @types/react: TypeScript types for React.
+- @types/node: TypeScript types for Node.js.
+
+```
+npm install --save-dev next next-images @types/react @types/node
+```
 
