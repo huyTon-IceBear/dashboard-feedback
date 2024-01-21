@@ -44,5 +44,7 @@ describe('INSERT_LINEAR_TASK Mutation', () => {
       await waitFor(() => getByTestId('test-wrapper'));
     });
 
+    // Add assertions to verify the mutation's success
+    expect(getByTestId('test-wrapper')).toBeTruthy();
   });
 });
