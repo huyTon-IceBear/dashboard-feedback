@@ -43,7 +43,7 @@ export default function FeedbackToolbar({
   console.log(issues);
   const handleCreateTask = useCallback(() => {
     const createTaskPath =
-      feedbackIssue.toLocaleLowerCase() === issues[0].toLocaleLowerCase()
+      feedbackIssue?.toLocaleLowerCase() === issues[0]?.toLocaleLowerCase()
         ? paths.dashboard.task.new.rfc
         : paths.dashboard.task.new.bugfix;
     router.push(`${createTaskPath}?feedbackId=${feedbackId}`);

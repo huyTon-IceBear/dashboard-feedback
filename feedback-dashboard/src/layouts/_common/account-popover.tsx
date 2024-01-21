@@ -27,14 +27,6 @@ const OPTIONS = [
     label: 'Home',
     linkTo: '/',
   },
-  {
-    label: 'Profile',
-    linkTo: paths.dashboard.user.profile,
-  },
-  {
-    label: 'Settings',
-    linkTo: paths.dashboard.user.account,
-  },
 ];
 
 // ----------------------------------------------------------------------

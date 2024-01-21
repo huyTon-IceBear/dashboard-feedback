@@ -59,10 +59,6 @@ export default function FeedbackDetails({ feedback }: Props) {
       .then(() => {
         setIsLoading(false);
       });
-
-    getIssues().then((response) => {
-      console.log(response);
-    });
   }, []);
 
   const renderMediaFile = (
