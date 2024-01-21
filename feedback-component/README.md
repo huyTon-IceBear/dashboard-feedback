@@ -42,13 +42,17 @@ The `api/feedback` folder within `feedback-component` houses the API module resp
 
 To understand and contribute to the development of the Feedback API, navigate to the [api/feedback](./feedback-component/api/feedback) folder.
 
+## Configuration
+
+Make sure to set up your environment variables by copying the provided `.env.example` 
+
 ## Getting Started
 
 To integrate the SnapFlow Feedback component into your Next.js, React, TypeScript project, follow these steps:
 
 1. Add the `feedback-component` component to your project.
 
-2. Install all needed dependencies
+2. Install all needed dependencies and add all needed keys for environment file
 
 3. Now, you can use the `FeedbackButton` component within your project.
 
