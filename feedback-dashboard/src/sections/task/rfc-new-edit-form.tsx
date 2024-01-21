@@ -29,17 +29,17 @@ import { TaskRFC, TaskRFCData, TaskLinear, INSERT_TASK_MUTATION } from 'src/type
 import { FeedbackRFCType } from 'src/types/feedback';
 import { useMutation } from '@apollo/client';
 import { INSERT_LINEAR_TASK } from 'src/graphql/task';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 
 // ----------------------------------------------------------------------
 
 type Props = {
   currentTask?: TaskRFC;
   feedback?: FeedbackRFCType;
+  router: AppRouterInstance;
 };
 
-export default function RFCTaskNewEditForm({ currentTask, feedback }: Props) {
-  const router = useRouter();
-
+export default function RFCTaskNewEditForm({ currentTask, feedback, router }: Props) {
   const { enqueueSnackbar } = useSnackbar();
 
   const NewTaskSchema = Yup.object().shape({
@@ -110,7 +110,7 @@ export default function RFCTaskNewEditForm({ currentTask, feedback }: Props) {
   const [insertTask, { loading }] = useMutation<INSERT_TASK_MUTATION>(INSERT_LINEAR_TASK, {
     onCompleted: () => {
       reset();
-      router.push(paths.dashboard.task.root);
+      router.push(paths.dashboard.feedback.root);
     },
   });
 

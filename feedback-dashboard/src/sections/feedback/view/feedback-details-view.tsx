@@ -10,7 +10,7 @@ import { useSettingsContext } from 'src/components/settings';
 import FeedbackDetails from '../feedback-details';
 import FeedbackToolbar from '../feedback-toolbar';
 import { GET_A_FEEDBACK } from '../feedback-data-request';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FeedbackIssue } from 'src/types/feedback';
 import { GET_FEEDBACK_ISSUES } from 'src/graphql/feedback';
 // ----------------------------------------------------------------------
@@ -22,11 +22,23 @@ type Props = {
 export default function FeedbackDetailsView({ id }: Props) {
   const settings = useSettingsContext();
   const [issues, setIssue] = useState<string[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    return () => {
+      setIsMounted(false);
+    };
+  }, []);
+
   useQuery(GET_FEEDBACK_ISSUES, {
     onCompleted: (data) => {
-      setIssue(data.feedback_issue.map((issue: FeedbackIssue) => issue.value));
+      if (isMounted) {
+        setIssue(data?.feedback_issue?.map((issue: FeedbackIssue) => issue.value) || []);
+      }
     },
   });
+
   const { loading, data } = useQuery(GET_A_FEEDBACK, {
     variables: {
       id,
@@ -40,12 +52,12 @@ export default function FeedbackDetailsView({ id }: Props) {
       ) : (
         <>
           <FeedbackToolbar
-            backLink={paths.dashboard.task.root}
-            feedbackIssue={data.feedback_by_pk.issue}
-            feedbackId={data.feedback_by_pk.id}
+            backLink={paths?.dashboard?.task.root}
+            feedbackIssue={data?.feedback_by_pk?.issue}
+            feedbackId={data?.feedback_by_pk?.id}
             issues={issues}
           />
-          <FeedbackDetails feedback={data.feedback_by_pk} />
+          <FeedbackDetails feedback={data?.feedback_by_pk} />
         </>
       )}
     </Container>

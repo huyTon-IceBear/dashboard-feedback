@@ -32,18 +32,18 @@ import { INSERT_TASK_MUTATION, TaskBugfix, TaskBugfixData, TaskLinear } from 'sr
 import { FeedbackBugFixType } from 'src/types/feedback';
 import { useMutation } from '@apollo/client';
 import { INSERT_LINEAR_TASK } from 'src/graphql/task';
-import { useRouter } from 'next/router';
 import { paths } from 'src/routes/paths';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 // ----------------------------------------------------------------------
 
 type Props = {
   currentTask?: TaskBugfix;
   feedback?: FeedbackBugFixType;
+  router: AppRouterInstance;
 };
 
-export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) {
+export default function BugfixTaskNewEditForm({ currentTask, feedback, router }: Props) {
   const { enqueueSnackbar } = useSnackbar();
-  const router = useRouter();
 
   const NewTaskSchema = Yup.object().shape({
     reportBy: Yup.string().required('Field is required'),
@@ -154,7 +154,7 @@ export default function BugfixTaskNewEditForm({ currentTask, feedback }: Props) 
   const [insertTask, { loading }] = useMutation<INSERT_TASK_MUTATION>(INSERT_LINEAR_TASK, {
     onCompleted: () => {
       reset();
-      router.push(paths.dashboard.task.root);
+      router.push(paths.dashboard.feedback.root);
     },
   });
 

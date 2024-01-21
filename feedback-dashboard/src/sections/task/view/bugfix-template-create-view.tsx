@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client';
 import Container from '@mui/material/Container';
 // routes
 import { paths } from 'src/routes/paths';
-import { useSearchParams } from 'src/routes/hooks';
+import { useRouter, useSearchParams } from 'src/routes/hooks';
 // components
 import { useSettingsContext } from 'src/components/settings';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
@@ -14,6 +14,8 @@ import { GET_A_FEEDBACK_BUGFIX } from 'src/sections/feedback/feedback-data-reque
 // ----------------------------------------------------------------------
 
 export default function BugfixTemplateCreateView() {
+  const router = useRouter();
+
   const settings = useSettingsContext();
 
   const searchParams = useSearchParams();
@@ -51,7 +53,7 @@ export default function BugfixTemplateCreateView() {
             }}
           />
 
-          <BugfixTaskNewEditForm feedback={data?.feedback_by_pk} />
+          <BugfixTaskNewEditForm feedback={data?.feedback_by_pk} router={router} />
         </>
       )}
     </Container>

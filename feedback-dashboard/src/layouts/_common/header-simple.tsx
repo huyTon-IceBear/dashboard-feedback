@@ -52,15 +52,6 @@ export default function HeaderSimple() {
 
         <Stack direction="row" alignItems="center" spacing={1}>
           <SettingsButton />
-
-          <Link
-            href={paths.faqs}
-            component={RouterLink}
-            color="inherit"
-            sx={{ typography: 'subtitle2' }}
-          >
-            Need help?
-          </Link>
         </Stack>
       </Toolbar>
 
